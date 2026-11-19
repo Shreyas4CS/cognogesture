@@ -1196,7 +1196,7 @@ const AI = {
       setAI('busy', 'Loading AI…');
       try {
         this.vision = await FilesetResolver.forVisionTasks(WASM);
-        this.hands = await this.make(HandLandmarker, {baseOptions:{modelAssetPath:HAND_MODEL}, runningMode:'VIDEO', numHands:1, minHandDetectionConfidence:.55, minHandPresenceConfidence:.55, minTrackingConfidence:.5});
+        this.hands = await this.make(HandLandmarker, {baseOptions:{modelAssetPath:HAND_MODEL}, runningMode:'VIDEO', numHands:1, minHandDetectionConfidence:.35, minHandPresenceConfidence:.4, minTrackingConfidence:.4});
         this.embedder = await this.make(ImageEmbedder, {baseOptions:{modelAssetPath:EMB_MODEL}, runningMode:'IMAGE', l2Normalize:true, quantize:false});
         this.ready = true; setAI('ok', 'AI ready'); logEvent('AI models loaded');
       } catch (e) { console.error(e); setAI('error', 'AI failed'); toast('Could not load the AI models. Check the internet connection.', 'bad'); this.loading = null; }
@@ -1231,7 +1231,7 @@ const AI = {
     } catch { return null; }
   },
   async detectImage(cv){
-    if (!this.handsImg) this.handsImg = await this.make(HandLandmarker, {baseOptions:{modelAssetPath:HAND_MODEL}, runningMode:'IMAGE', numHands:1, minHandDetectionConfidence:.5});
+    if (!this.handsImg) this.handsImg = await this.make(HandLandmarker, {baseOptions:{modelAssetPath:HAND_MODEL}, runningMode:'IMAGE', numHands:1, minHandDetectionConfidence:.35});
     return this.handsImg.detect(cv)?.landmarks?.[0] || null;
   },
   sq:null, sqx:null,
@@ -1250,6 +1250,27 @@ function handFeat(lm, W, H){
   for (let i = 0; i < 21; i++){ v[i*3] = (lm[i].x - w.x)*a/s; v[i*3 + 1] = (lm[i].y - w.y)/s; v[i*3 + 2] = (lm[i].z - w.z)/s*.5; }
   return v;
 }
+/* finger-state features, added to the 21 points so that 1, 2, 3, 4, 5 fingers look clearly different:
+   per finger: how far it reaches out (straight = 1, folded = small) + how bent its 2 joints are,
+   thumb tucked or not, and the gaps between neighbouring fingertips (V sign vs fingers together).
+   Worked out from the saved points, so old training data keeps working. */
+const FINGERS = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16], [17, 18, 19, 20]];
+function handX(h){
+  const P = i => [h[i*3], h[i*3 + 1], h[i*3 + 2]*2], sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+  const len = v => Math.hypot(v[0], v[1], v[2]), cos = (a, b) => (a[0]*b[0] + a[1]*b[1] + a[2]*b[2])/((len(a)*len(b)) || 1e-6);
+  const W = 3, out = new Float32Array(84); out.set(h); let o = 63;
+  for (const [a, b, c, d] of FINGERS){
+    const A = P(a), B = P(b), C = P(c), D = P(d);
+    const reach = len(D)/((len(A) + len(sub(B, A)) + len(sub(C, B)) + len(sub(D, C))) || 1e-6);
+    out[o++] = W*1.6*reach; out[o++] = W*cos(sub(B, A), sub(C, B)); out[o++] = W*cos(sub(C, B), sub(D, C));
+  }
+  const tip = i => P(i);
+  out[o++] = W*len(sub(tip(4), P(5))); out[o++] = W*len(sub(tip(4), P(9)));
+  for (const [i, j] of [[4, 8], [8, 12], [12, 16], [16, 20]]) out[o++] = W*.7*len(sub(tip(i), tip(j)));
+  return out;
+}
+/* the fingerprint a stored sample is compared with (hand samples get the finger-state features) */
+const featOf = (s, k) => k === 'h' ? (s.h ? (s.hx || (s.hx = handX(s.h))) : null) : s[k];
 /* face → expression fingerprint: 51 MediaPipe expression scores (smile, mouth open, brows up, wink…) */
 function faceFeat(face){ const v = new Float32Array(51); for (let i = 1; i < 52 && i < face.bs.length; i++) v[i - 1] = face.bs[i].score; return v; }
 function ptsBox(pts, W, H, k, minK=.25){
@@ -1297,7 +1318,7 @@ const Model = {
     for (const [k, off, lo, hi] of [['h', .14, .3, 1.3], ['f', .05, .12, .8]]){
       const ds = [];
       for (const c of this.classes){
-        const vs = c.samples.filter(s => s[k]).map(s => s[k]); if (vs.length < 3) continue;
+        const vs = c.samples.map(s => featOf(s, k)).filter(Boolean); if (vs.length < 3) continue;
         const step = Math.max(1, Math.floor(vs.length / 40));
         for (let i = 0; i < vs.length; i += step){ let best = 1e9; for (let j = 0; j < vs.length; j++){ if (j === i) continue; const d = dist(vs[i], vs[j]); if (d < best) best = d; } ds.push(best); }
       }
@@ -1551,7 +1572,7 @@ function buildData(m, k){
   const cls = Model.classes.filter(c => c.bg ? c.samples.some(s => s[k]) : Model.mode(c) === m && c.samples.filter(s => s[k]).length >= 5);
   if (!cls.some(c => !c.bg)) return null;
   const X = [], y = [];
-  cls.forEach((c, ci) => c.samples.forEach(s => { if (s[k]){ X.push(s[k]); y.push(ci); } }));
+  cls.forEach((c, ci) => c.samples.forEach(s => { const v = featOf(s, k); if (v){ X.push(v); y.push(ci); } }));
   return {m, k, X, y, ids:cls.map(c => c.id), C:cls.length, metric:k === 'e' ? 'cos' : 'euc'};
 }
 function splitData(ds, frac, seed){
@@ -1592,7 +1613,7 @@ const Brain = {
     const cos = k === 'e', K = 5, top = []; let bestReal = 1e9, bestBg = 1e9;
     for (const c of Model.classes){
       if (!c.bg && Model.mode(c) !== m) continue;
-      for (const s of c.samples){ const v = s[k]; if (!v) continue;
+      for (const s of c.samples){ const v = featOf(s, k); if (!v) continue;
         const d = cos ? 1 - dot(feat, v) : dist(feat, v);
         if (c.bg){ if (d < bestBg) bestBg = d; } else if (d < bestReal) bestReal = d;
         if (top.length < K){ top.push({d, c}); top.sort((a, b) => a.d - b.d); } else if (d < top[K-1].d){ top[K-1] = {d, c}; top.sort((a, b) => a.d - b.d); } }
@@ -1693,11 +1714,12 @@ const Engine = {
     if (rec) Rec.take(f, hf, ff, emb, lm ? ptsBox(lm, W, H, 1.6) : face ? ptsBox(face.lm, W, H, 1.3) : box);
     // classify every kind that is trained, then combine. Anything else = unknown = STOP.
     const rs = [];
-    if (hf && Model.has('hand')) rs.push(Brain.classify('hand', 'h', 'hand sign', hf));
+    if (hf && Model.has('hand')) rs.push(Brain.classify('hand', 'h', 'hand sign', handX(hf)));
     if (ff && Model.has('face')) rs.push(Brain.classify('face', 'f', 'expression', ff));
     if (emb && Model.has('image')) rs.push(Brain.classify('image', 'e', 'object', emb));
     let r = Model.decide(rs);
     if (!r.why && !r.c) r.why = !Model.trained().length ? 'No gestures trained yet' : lm ? 'Not a trained gesture' : face ? 'Not a trained expression' : 'Nothing trained in view';
+    if (!r.c && !lm && Model.has('hand')) r.why = 'No hand found · show your palm and wrist, a bit farther away';
     this.res = r;
     // steady filter: a gesture must be seen N frames in a row; unknown stops within 2 frames
     if (r.c){
