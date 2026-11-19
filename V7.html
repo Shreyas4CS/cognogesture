@@ -1,0 +1,2301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F5821E">
+<title>Cogno Gesture · CognoQuest AI robotics kit · CognoSpace</title>
+<meta name="description" content="Train your own hand gestures in the browser and drive an ESP32 robot through a maze with them. By CognoSpace.">
+<link rel="icon" id="favIcon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23F5821E'/%3E%3Cstop offset='.55' stop-color='%23E0457B'/%3E%3Cstop offset='1' stop-color='%237C3AED'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cpath d='M27 40V18a3 3 0 0 1 6 0v14M33 30v-4a3 3 0 0 1 6 0v6M39 30a3 3 0 0 1 6 0v6c0 7-5 12-12 12h-2c-5 0-8-3-10-7l-4-8a3 3 0 0 1 5-3l3 4' fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- icons -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14M19 12l-7 7-7-7"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 6 6v5"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0-6 6v5"/></symbol>
+  <symbol id="i-ul" viewBox="0 0 24 24"><path d="M17 17 7 7M7 15V7h8"/></symbol>
+  <symbol id="i-ur" viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></symbol>
+  <symbol id="i-dl" viewBox="0 0 24 24"><path d="M17 7 7 17M15 17H7V9"/></symbol>
+  <symbol id="i-dr" viewBox="0 0 24 24"><path d="M7 7l10 10M9 17h8V9"/></symbol>
+  <symbol id="i-face" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5a4.5 4.5 0 0 0 7 0M9 9.5h.01M15 9.5h.01"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></symbol>
+  <symbol id="i-auto" viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="3"/></symbol>
+  <symbol id="i-hand" viewBox="0 0 24 24"><path d="M18 11V6a2 2 0 0 0-4 0v5M14 10V4a2 2 0 0 0-4 0v6M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-6-2.4l-3.6-3.6a2 2 0 0 1 2.8-2.8L7 15"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4v16l13-8z"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+  <symbol id="i-bt" viewBox="0 0 24 24"><path d="m7 7 10 10-5 5V2l5 5L7 17"/></symbol>
+  <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 2v10M18.4 6.6a9 9 0 1 1-12.8 0"/></symbol>
+  <symbol id="i-cam" viewBox="0 0 24 24"><path d="M3 7h3l2-3h8l2 3h3v12H3z"/><circle cx="12" cy="13" r="4"/></symbol>
+  <symbol id="i-switch" viewBox="0 0 24 24"><path d="M3 7h3l2-3h8l2 3h3v12H3z"/><path d="M9 13a3 3 0 0 1 5.2-2M15 13a3 3 0 0 1-5.2 2M14 9v2h-2M10 17v-2h2"/></symbol>
+  <symbol id="i-mirror" viewBox="0 0 24 24"><path d="M12 3v18M8 7 3 12l5 5V7zM16 7l5 5-5 5V7z"/></symbol>
+  <symbol id="i-flip" viewBox="0 0 24 24"><path d="M3 12h18M7 8l5-5 5 5H7zM7 16l5 5 5-5H7z"/></symbol>
+  <symbol id="i-rot" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></symbol>
+  <symbol id="i-img" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 11 9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-brain" viewBox="0 0 24 24"><path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 3 3h1V4z"/><path d="M15 4a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-3 3h-1V4z"/></symbol>
+  <symbol id="i-down2" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></symbol>
+  <symbol id="i-up2" viewBox="0 0 24 24"><path d="M12 21V9M7 14l5-5 5 5M5 3h14"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+  <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2z"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-gauge" viewBox="0 0 24 24"><path d="M12 14l4-4M3.3 17a9 9 0 1 1 17.4 0"/></symbol>
+  <symbol id="i-maze" viewBox="0 0 24 24"><path d="M3 3h18v18H3zM7 3v10h4M15 7h6M11 7v4M7 17h10v-6"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+  <symbol id="i-chip" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></symbol>
+  <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></symbol>
+  <symbol id="i-knn" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="2"/><circle cx="7.5" cy="8.5" r="1.3"/><circle cx="16.5" cy="9.5" r="1.3"/><circle cx="9.5" cy="16.5" r="1.3"/></symbol>
+  <symbol id="i-nn" viewBox="0 0 24 24"><circle cx="4.5" cy="7" r="2"/><circle cx="4.5" cy="17" r="2"/><circle cx="12" cy="4.5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19.5" r="2"/><circle cx="19.5" cy="12" r="2"/><path d="M6.4 6.3 10.1 5M6.3 8l4 3M6.3 16l4-3M6.4 17.7l3.7 1.3M13.6 5.8l4.5 5M14 12h3.5M13.6 18.2l4.5-5"/></symbol>
+  <symbol id="i-svm" viewBox="0 0 24 24"><path d="M3 21 21 3"/><path d="M3 15 15 3M9 21 21 9" stroke-dasharray="2 2.5"/><circle cx="6" cy="6" r="1.6"/><circle cx="9.5" cy="4" r="1.2"/><circle cx="18" cy="18" r="1.6"/><circle cx="20" cy="14.5" r="1.2"/></symbol>
+  <symbol id="i-tree" viewBox="0 0 24 24"><rect x="9.5" y="2" width="5" height="4" rx="1.2"/><rect x="3" y="11" width="5" height="4" rx="1.2"/><rect x="16" y="11" width="5" height="4" rx="1.2"/><rect x="9.5" y="18" width="5" height="4" rx="1.2"/><path d="M12 6v2.5M5.5 11V8.5h13V11M18.5 15v1.5H12V18"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3 2 20h20zM12 10v4M12 17h.01"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><rect x="3" y="4" width="8" height="6" rx="2"/><rect x="7" y="14" width="14" height="6" rx="2"/><path d="M7 10v4M14 7h7"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></symbol>
+  <symbol id="i-kit" viewBox="0 0 24 24"><path d="M3 8h18v12H3zM8 8V5a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v3M3 13h18"/></symbol>
+  <symbol id="i-screen" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M7 21h10M7 9h6M7 13h10"/></symbol>
+  <symbol id="i-motor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.5"/><path d="M12 4v5.5M12 14.5V20M4 12h5.5M14.5 12H20"/></symbol>
+  <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6L4 19a1.5 1.5 0 0 0 1.3 2h13.4a1.5 1.5 0 0 0 1.3-2L14 9V3"/><path d="M7 15h10"/></symbol>
+</svg>
+
+<header class="masthead">
+  <div class="mh">
+    <div class="brand">
+      <span id="logoSlot"></span>
+      <button class="wordmark" id="wordHome" title="Home">Cogno Gesture</button>
+    </div>
+    <nav class="mh__nav">
+      <div id="homeNav">
+        <button class="navbtn navbtn--brand" id="openApp"><svg class="i"><use href="#i-hand"/></svg><span>Open the app</span></button>
+      </div>
+      <div id="appNav" hidden>
+        <div class="seg" id="modeSeg">
+          <span class="seg-ind" id="segInd"></span>
+          <button data-mode="collect" class="on" title="1 · Collect data"><svg class="i"><use href="#i-db"/></svg><span>Collect</span></button>
+          <button data-mode="train" title="2 · Train &amp; compare models"><svg class="i"><use href="#i-brain"/></svg><span>Train</span></button>
+          <button data-mode="code" title="3 · Code &amp; test the robot"><svg class="i"><use href="#i-code"/></svg><span>Code</span></button>
+          <button data-mode="live" title="4 · Live (unlocks after you deploy a model)"><svg class="i lk"><use href="#i-lock"/></svg><svg class="i ul"><use href="#i-play"/></svg><span>Live</span></button>
+        </div>
+        <button class="navbtn navbtn--ble" id="bleBtn" title="Connect the robot over Bluetooth"><i class="dot" id="bleDot"></i><svg class="i"><use href="#i-bt"/></svg><span id="bleTxt">Connect robot</span></button>
+        <button class="navbtn navbtn--icon" id="clearBtn" title="Clear all training data saved on this device"><svg class="i"><use href="#i-trash"/></svg></button>
+        <button class="navbtn" id="homeBtn" title="Back to home (your training is kept)"><svg class="i"><use href="#i-home"/></svg><span>Home</span></button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- ==================== LANDING ==================== -->
+<div id="viewHome">
+<main>
+  <section class="hero">
+    <div class="shell hero__grid">
+      <div>
+        <span class="eyebrow reveal" style="--d:0ms"><b>CognoQuest</b> · AI robotics expo kit</span>
+        <div class="hero__brand reveal" style="--d:40ms">Cogno Gesture</div>
+        <h1 class="reveal" style="--d:90ms">Teach a robot to see. Code it with blocks. Race it through the maze.</h1>
+        <p class="hero__lede reveal" style="--d:160ms">Show a finger for <b>Forward</b>, a smile for <b>Left</b>, an apple for <b>Speed 40%</b>. Train <b>four AI models</b>, deploy the most accurate one, then snap together <b>code blocks</b> and send the program to your robot over Bluetooth.</p>
+        <div class="hero__actions reveal" style="--d:230ms">
+          <button class="btn btn--brand btn--lg" id="heroStart"><svg class="i"><use href="#i-hand"/></svg>Start training</button>
+          <a class="btn btn--ghost btn--lg" href="#how">How it works</a>
+        </div>
+        <div class="hero__chips reveal" style="--d:300ms">
+          <span class="chip"><i class="dot" data-state="ok"></i>No install · Chrome / Edge</span>
+          <span class="chip"><svg class="i" style="width:15px;height:15px"><use href="#i-bt"/></svg>ESP32 over Bluetooth</span>
+          <span class="chip"><svg class="i" style="width:15px;height:15px"><use href="#i-code"/></svg>Block coding</span>
+          <span class="chip"><svg class="i" style="width:15px;height:15px"><use href="#i-shield"/></svg>Unknown sign = stop</span>
+        </div>
+      </div>
+      <div class="demo reveal" style="--d:140ms" aria-hidden="true">
+        <div class="demo__head"><b>Your gestures → your robot</b><span class="live"><i class="dot" data-state="ok"></i>LIVE</span></div>
+        <div class="gcards" id="demoCards">
+          <div class="gcard" style="--gc:#22A55B"><div class="em">☝️</div><b>Forward</b><small><svg class="i"><use href="#i-up"/></svg>go</small></div>
+          <div class="gcard" style="--gc:#2E8BC0"><div class="em">👈</div><b>Left</b><small><svg class="i"><use href="#i-left"/></svg>turn</small></div>
+          <div class="gcard" style="--gc:#7C3AED"><div class="em">✌️</div><b>Speed</b><small><svg class="i"><use href="#i-gauge"/></svg>20%</small></div>
+          <div class="gcard" style="--gc:#E0484B"><div class="em">✊</div><b>Stop</b><small><svg class="i"><use href="#i-stop"/></svg>halt</small></div>
+        </div>
+        <div class="maze">
+          <svg viewBox="0 0 400 170">
+            <path class="wall" d="M10 10H390V160H10ZM90 10V100M170 60V160M250 10V110M330 60V160M90 100H130M250 110H290"/>
+            <path class="trail" d="M48 140V40H130V135H210V35H290V135H360V30"/>
+            <g transform="translate(348 22)"><rect x="-13" y="-10" width="26" height="22" rx="6" fill="#F5821E"/><circle cx="-6" cy="0" r="2.6" fill="#fff"/><circle cx="6" cy="0" r="2.6" fill="#fff"/><rect x="-16" y="-2" width="3" height="10" rx="1.5" fill="#414042"/><rect x="13" y="-2" width="3" height="10" rx="1.5" fill="#414042"/></g>
+          </svg>
+        </div>
+        <div class="unknown-note"><svg class="i"><use href="#i-shield"/></svg><span>Someone waves something it wasn’t taught? <b>The robot stops.</b></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="how">
+    <div class="shell">
+      <div class="section__head">
+        <h2>How it works</h2>
+        <p>The same path real AI engineers follow: collect data, train models, test them fairly, deploy the best one, then program what the robot does with it.</p>
+      </div>
+      <div class="steps">
+        <div class="step"><span class="si"><svg class="i"><use href="#i-db"/></svg></span><h3>Collect data</h3><p>Add gestures (hand signs, faces or objects), hold Record for 50–150 pictures each, and set the robot's default PWM speed.</p></div>
+        <div class="step"><span class="si"><svg class="i"><use href="#i-brain"/></svg></span><h3>Train &amp; deploy</h3><p>KNN, Neural Network, SVM and Random Forest learn from the same pictures. Try each one on the camera, then deploy the best.</p></div>
+        <div class="step"><span class="si"><svg class="i"><use href="#i-code"/></svg></span><h3>Code &amp; test</h3><p>Snap blocks together: “when ☝️ is seen → move forward”, loops, functions, LCD and OLED messages. Upload over Bluetooth and test.</p></div>
+        <div class="step"><span class="si"><svg class="i"><use href="#i-gauge"/></svg></span><h3>Drive live</h3><p>Race the maze with a live speedometer. Anything the robot was not taught keeps it still.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="shell">
+      <div class="facts">
+        <div class="fact"><div class="fact__k">4</div><div class="fact__v">AI algorithms trained and compared</div></div>
+        <div class="fact"><div class="fact__k">21</div><div class="fact__v">hand points tracked by MediaPipe</div></div>
+        <div class="fact"><div class="fact__k">0.15 s</div><div class="fact__v">to stop on an unknown sign</div></div>
+        <div class="fact"><div class="fact__k">100%</div><div class="fact__v">of the AI runs on this device</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section kitsec" id="kit" style="padding-top:0">
+    <div class="shell">
+      <div class="kit">
+        <div class="kit__intro">
+          <span class="eyebrow"><svg class="i" style="width:15px;height:15px;color:var(--brand)"><use href="#i-kit"/></svg><b>CognoQuest kit</b> · everything in the box</span>
+          <h2>Your team gets the whole robot. You bring the ideas.</h2>
+          <p>Every CognoQuest team receives a kit with an ESP32 that is already flashed. There is no wiring code to write and no Arduino IDE to install: train the AI here, build the program with blocks, and send it to the robot over Bluetooth.</p>
+          <div class="kit__flash"><svg class="i"><use href="#i-chip"/></svg><span><b>Flash once, program forever.</b> CognoGesture.ino stays on the ESP32. Every new block program is uploaded wirelessly and saved on the robot.</span></div>
+        </div>
+        <div class="kit__grid">
+          <div class="kitem"><span class="ki"><svg class="i"><use href="#i-chip"/></svg></span><b>ESP32</b><small>the robot's brain · Bluetooth</small></div>
+          <div class="kitem"><span class="ki"><svg class="i"><use href="#i-motor"/></svg></span><b>2 DC motors + L298N</b><small>wheels with PWM speed control</small></div>
+          <div class="kitem"><span class="ki"><svg class="i"><use href="#i-screen"/></svg></span><b>20×4 I2C LCD</b><small>show messages and status</small></div>
+          <div class="kitem"><span class="ki"><svg class="i"><use href="#i-face"/></svg></span><b>0.96" OLED</b><small>robot eyes and big text</small></div>
+          <div class="kitem"><span class="ki"><svg class="i"><use href="#i-power"/></svg></span><b>Battery pack</b><small>with switch</small></div>
+          <div class="kitem"><span class="ki"><svg class="i"><use href="#i-maze"/></svg></span><b>Chassis + wires</b><small>ready for the expo maze</small></div>
+        </div>
+      </div>
+      <details class="panel more wiring">
+        <summary><svg class="i"><use href="#i-chip"/></svg>Wiring for mentors<svg class="i car"><use href="#i-chev"/></svg></summary>
+        <div class="wtable">
+          <div><b>L298N ENA</b><span>GPIO 14</span></div><div><b>IN1 / IN2</b><span>GPIO 27 / 26</span></div>
+          <div><b>L298N ENB</b><span>GPIO 32</span></div><div><b>IN3 / IN4</b><span>GPIO 25 / 33</span></div>
+          <div><b>LCD + OLED SDA</b><span>GPIO 21</span></div><div><b>LCD + OLED SCL</b><span>GPIO 22</span></div>
+          <div><b>LCD address</b><span>0x27 or 0x3F (auto)</span></div><div><b>OLED address</b><span>0x3C (auto)</span></div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="shell">
+      <div class="callout">
+        <div>
+          <h2>Ready for CognoQuest?</h2>
+          <p>Switch on the robot, open the app, and go: Collect → Train → Code → Live.</p>
+        </div>
+        <button class="btn btn--brand btn--lg" id="ctaStart">Open the app</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="shell">
+    <div class="foot__grid">
+      <div class="foot__brand">
+        <span id="footLogo"></span>
+        <p class="foot__blurb">CognoSpace builds experiential learning for schools: STEM, robotics, IoT and AI, hands on.</p>
+        <a class="foot__site" href="https://www.cognospace.in" target="_blank" rel="noopener">www.cognospace.in <svg class="i" style="width:14px;height:14px"><use href="#i-arrow"/></svg></a>
+      </div>
+      <nav class="foot__col"><h3>App</h3><a href="#" data-go="collect">Collect data</a><a href="#" data-go="train">Train models</a><a href="#" data-go="code">Code blocks</a><a href="#" data-go="live">Live drive</a><a href="#how">How it works</a></nav>
+      <nav class="foot__col"><h3>Requirements</h3><span>Chrome or Edge</span><span>A camera</span><span>ESP32 with BLE</span><span>Data stays on your device</span></nav>
+      <div class="foot__col"><h3>Built with</h3><span>MediaPipe vision</span><span>KNN · Neural Network</span><span>SVM · Random Forest</span><span>Blockly · Web Bluetooth</span></div>
+    </div>
+    <div class="foot__bar">
+      <span>Made by <strong>CognoSpace</strong> for the <strong>CognoQuest</strong> expo</span>
+      <span class="foot__year">© <span id="footYear">2026</span> CognoSpace · All rights reserved</span>
+    </div>
+  </div>
+</footer>
+</div>
+
+<!-- ==================== APP ==================== -->
+<div id="viewApp" hidden>
+  <div class="app" id="appMain">
+    <div class="stagecol">
+      <div class="stage" id="stage">
+        <video id="cam" playsinline muted autoplay></video>
+        <canvas id="overlay"></canvas>
+        <div class="st-tl"><span class="pill" id="modePill"><i class="dot"></i>Collecting data</span><span class="pill" id="spdPill"><svg class="i" style="width:15px;height:15px;color:var(--brand)"><use href="#i-gauge"/></svg><span>Speed 40%</span></span><span class="pill" id="fpsPill" hidden>0 fps</span></div>
+        <div class="spdflash" id="spdFlash" hidden><svg class="i"><use href="#i-gauge"/></svg><span><small>SPEED SET TO</small><b id="sfVal">40%</b></span></div>
+        <div class="badge stop" id="badge"><span class="bi" id="badgeIc"><svg class="i"><use href="#i-stop"/></svg></span><span><b id="badgeT">No gesture</b><small id="badgeS">Show a trained gesture</small></span></div>
+        <div class="stage-empty" id="stageEmpty">
+          <div><div class="ei"><svg class="i"><use href="#i-cam"/></svg></div><b>Camera is off</b><p>Turn it on to train and to drive with your gestures. Nothing leaves this device.</p><button class="btn btn--brand" id="camOnBtn"><svg class="i"><use href="#i-power"/></svg>Turn on camera</button></div>
+        </div>
+      </div>
+      <div class="camtools" id="camtools">
+        <button class="icon-btn" data-cam="power" title="Camera on / off"><svg class="i"><use href="#i-power"/></svg></button>
+        <button class="icon-btn" data-cam="switch" title="Switch camera"><svg class="i"><use href="#i-switch"/></svg></button>
+        <button class="icon-btn" data-cam="mirror" title="Mirror"><svg class="i"><use href="#i-mirror"/></svg></button>
+        <button class="icon-btn" data-cam="flip" title="Flip upside down"><svg class="i"><use href="#i-flip"/></svg></button>
+        <button class="icon-btn" data-cam="rot" title="Rotate 180°"><svg class="i"><use href="#i-rot"/></svg></button>
+        <div class="zoomseg" id="zoomSeg" hidden></div>
+        <span class="sp"></span>
+        <span class="stat" id="camLbl"><svg class="i"><use href="#i-cam"/></svg><span>Camera off</span></span>
+        <span class="stat" id="aiStat"><i class="dot" id="aiDot"></i><span id="aiTxt">AI idle</span></span>
+      </div>
+    </div>
+
+    <!-- ===== TRAIN side ===== -->
+    <aside class="side" id="trainSide">
+      <div class="panel">
+        <div class="panel__head"><h2><svg class="i"><use href="#i-hand"/></svg>Your gestures</h2><div class="r"><span class="tag brand" id="gCount">0 gestures</span><button class="mini-btn" id="exportBtn" title="Export training (backup file)"><svg class="i"><use href="#i-down2"/></svg></button><button class="mini-btn" id="importBtn" title="Import training"><svg class="i"><use href="#i-up2"/></svg></button></div></div>
+        <div class="panel__body">
+          <div class="addrow"><input class="txt" id="newName" maxlength="24" placeholder="Name a gesture, e.g. Forward"><button class="btn btn--brand" id="addBtn"><svg class="i"><use href="#i-plus"/></svg>Add</button></div>
+          <div class="quick" id="quick"></div>
+        </div>
+      </div>
+      <div class="gestures" id="gList"></div>
+      <div class="panel">
+        <div class="panel__head"><h2><svg class="i"><use href="#i-gauge"/></svg>Robot speed</h2><div class="r"><span class="tag brand" id="defPwm">PWM 102 / 255</span></div></div>
+        <div class="panel__body">
+          <div class="defrow">
+            <label class="fld"><span>Default PWM speed <output id="defOut">40%</output></span><input type="range" id="defSpeed" min="10" max="100" step="5"></label>
+            <div class="defnum"><span><b id="defBig">40</b><small>% PWM</small></span></div>
+          </div>
+          <p class="hint" style="margin-top:.6rem">The robot drives at this speed in Live. Speed gestures can still change it while you drive.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel__head"><h2><svg class="i"><use href="#i-eye"/></svg>What the AI sees now</h2><div class="r"><span class="tag" id="predBrain">KNN</span></div></div>
+        <div class="panel__body preds" id="preds"><div class="hint">Turn on the camera and add a gesture to see live predictions.</div></div>
+      </div>
+      <button class="nextcta" id="toTrain"><span class="ni"><svg class="i"><use href="#i-brain"/></svg></span><span><b>Next: train &amp; compare models</b><small id="toTrainSub">0 gestures · 0 pictures</small></span><span class="go"><span>Train</span><svg class="i"><use href="#i-next"/></svg></span></button>
+      <div class="tipbox"><svg class="i"><use href="#i-bulb"/></svg><div><b>More pictures = more accurate.</b> Record each gesture 50–150 times: move it closer and farther, tilt it a little, try both hands if you will use both. Add <b>Speed gestures</b> (e.g. two fingers = 20%) to change the PWM speed. Record <b>No gesture</b> with your hand relaxed or out of view so the robot learns when to stay still.</div></div>
+      <input type="file" id="importFile" accept=".json,application/json" hidden>
+      <input type="file" id="upFile" accept="image/*" multiple hidden>
+    </aside>
+
+    <!-- ===== LIVE side ===== -->
+    <aside class="side" id="liveSide" hidden>
+      <div class="blecard" id="bleCard"><svg class="i" style="color:var(--warn)"><use href="#i-bt"/></svg><p><b>Robot not connected</b>Connect to run your program.</p><button class="btn btn--brand btn--sm" id="bleCardBtn">Connect</button></div>
+      <div class="brain" id="brainCard"></div>
+      <div class="brain prog" id="progCard"></div>
+      <div class="panel gcard2" id="spdCard">
+        <div class="gauge" id="gaugeBox">
+          <svg id="gauge" viewBox="0 0 300 232" role="img" aria-label="Speedometer">
+            <defs>
+              <linearGradient id="gGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22A55B"/><stop offset=".5" stop-color="#F5821E"/><stop offset="1" stop-color="#E0457B"/></linearGradient>
+              <filter id="gGlow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            </defs>
+            <path id="gTrack" fill="none" stroke="var(--surface-3)" stroke-width="16" stroke-linecap="round"/>
+            <path id="gArc" fill="none" stroke="url(#gGrad)" stroke-width="16" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" filter="url(#gGlow)"/>
+            <g id="gTicks"></g>
+            <g id="gSet"><path d="M272 150 283 143.5v13z" fill="var(--brand)"/></g>
+            <g id="gNeedle"><path class="needle" d="M136 150 238 147.4 245 150 238 152.6z"/><circle class="hub" cx="150" cy="150" r="11"/><circle cx="150" cy="150" r="4" fill="#fff"/></g>
+            <text id="gVal" class="gv" x="150" y="194">0</text>
+            <text id="gPwm" class="gu" x="150" y="224">% SPEED · PWM 0</text>
+          </svg>
+        </div>
+        <div class="gmeta">
+          <div class="gset" title="The speed the robot uses when it moves"><i class="k"></i><b id="gSetTxt">40%</b><span id="gBy">set speed</span></div>
+          <span class="gdir" id="gDir"><svg class="i"><use href="#i-stop"/></svg><span>STOPPED</span></span>
+        </div>
+        <div class="wbars">
+          <div class="wbar"><span>L</span><span class="t"><i id="wlB"></i></span><output id="wl">0</output></div>
+          <div class="wbar"><span>R</span><span class="t"><i id="wrB"></i></span><output id="wr">0</output></div>
+        </div>
+      </div>
+      <button class="armbtn" id="armBtn"><svg class="i"><use href="#i-play"/></svg><span>Run program</span></button>
+      <div class="panel">
+        <div class="panel__body">
+          <div class="live-now" style="margin:0 0 1rem"><span class="sw" id="lnSw"></span><span><b id="lnName">No gesture</b><small id="lnWhy">Robot is stopped</small></span><span class="spd"><b id="lnPct">0</b><small>% sure</small></span></div>
+          <div class="conf"><i id="lnConf"></i></div>
+        </div>
+      </div>
+      <details class="panel more">
+        <summary><svg class="i"><use href="#i-gauge"/></svg>Drive settings<svg class="i car"><use href="#i-chev"/></svg></summary>
+        <div class="panel__body" style="padding-top:0">
+          <label class="fld"><span>Trim (if it drifts) <output id="trimOut">0</output></span><input type="range" id="trim" min="-25" max="25" step="1"></label>
+          <label class="fld"><span>Steadiness <output id="steadyOut">3 frames</output></span><input type="range" id="steady" min="1" max="8" step="1"></label>
+          <label class="fld"><span>Strictness <output id="strictOut">Normal</output></span><input type="range" id="strict" min="0" max="2" step="1"></label>
+          <p class="hint" style="margin-top:.7rem">Trim is sent to the robot straight away. Steadiness: how many frames in a row a gesture must be seen before the robot reacts. Strictness: how close to your training a gesture must look. Unknown signs count as “nothing seen”.</p>
+        </div>
+      </details>
+      <details class="panel more">
+        <summary><svg class="i"><use href="#i-list"/></svg>Gesture map<svg class="i car"><use href="#i-chev"/></svg></summary>
+        <div class="panel__body legend" id="legend" style="padding-top:0"></div>
+      </details>
+      <details class="panel more">
+        <summary><svg class="i"><use href="#i-list"/></svg>Event log<svg class="i car"><use href="#i-chev"/></svg></summary>
+        <div class="log" id="log"></div>
+      </details>
+    </aside>
+  </div>
+
+  <!-- ===== TRAIN view: 4 algorithms side by side ===== -->
+  <section class="lab" id="trainView" hidden>
+    <div class="lab-head">
+      <div>
+        <span class="eyebrow"><b>STEP 2</b> · Train &amp; compare</span>
+        <h1>Which <span>AI brain</span> drives best?</h1>
+        <p>Your pictures are split in two. Most of them teach the four algorithms; the rest stay hidden and are used as a test. The model that gets the most hidden pictures right is the one to trust in Live.</p>
+      </div>
+      <div class="r"><button class="btn btn--brand btn--lg" id="runAll"><svg class="i"><use href="#i-brain"/></svg><span>Train &amp; test all 4</span></button></div>
+    </div>
+    <div class="panel labdata">
+      <div>
+        <h3><svg class="i"><use href="#i-db"/></svg>Your data <span class="tag" id="labTot" style="margin-left:auto">0 pictures</span></h3>
+        <div class="cls" id="labCls"></div>
+      </div>
+      <div>
+        <h3><svg class="i"><use href="#i-eye"/></svg>Hidden test pictures <output id="fracOut" class="mono" style="margin-left:auto;font-size:.85rem;color:var(--brand-deep)">20%</output></h3>
+        <input type="range" id="frac" min="10" max="40" step="5" style="margin-top:.9rem" aria-label="Share of pictures kept for the test">
+        <div class="splitbar" id="spBar"><i style="width:80%"></i><i style="width:20%"></i></div>
+        <div class="splitlbl"><span><i style="background:var(--brand)"></i>Learn from <b id="spTr">0</b></span><span><i style="background:var(--violet)"></i>Test on <b id="spTe">0</b></span></div>
+      </div>
+    </div>
+    <div class="labwarn" id="labWarn" hidden><svg class="i"><use href="#i-warn"/></svg><span></span></div>
+    <div class="pipe" aria-hidden="true">
+      <div class="pn"><span class="pi"><svg class="i"><use href="#i-cam"/></svg></span><span><b>Camera</b><small>your pictures</small></span></div><i class="pl"></i>
+      <div class="pn"><span class="pi"><svg class="i"><use href="#i-hand"/></svg></span><span><b>MediaPipe</b><small>hand points · face · object fingerprint</small></span></div><i class="pl"></i>
+      <div class="pn"><span class="pi"><svg class="i"><use href="#i-brain"/></svg></span><span><b>Algorithm</b><small>KNN · NN · SVM · Forest</small></span></div><i class="pl"></i>
+      <div class="pn"><span class="pi"><svg class="i"><use href="#i-bt"/></svg></span><span><b>Robot</b><small>move + PWM speed</small></span></div>
+    </div>
+    <div class="algos" id="algos"></div>
+    <div class="panel trypanel" id="tryPanel" hidden>
+      <div class="mini mini--lg"><canvas id="tryCv"></canvas><div class="mini-off" data-camon><svg class="i"><use href="#i-cam"/></svg><b>Camera is off</b><button class="btn btn--brand btn--sm">Turn on camera</button></div><span class="mini-lbl" id="tryLbl"></span></div>
+      <div class="try-side">
+        <div class="try-head"><div><small>TRY IT LIVE</small><h3>Show your gestures to each model</h3></div><button class="mini-btn" id="tryClose" title="Close"><svg class="i"><use href="#i-x"/></svg></button></div>
+        <div class="mpills" id="tryPills"></div>
+        <div class="preds" id="tryPreds"></div>
+        <div class="try-acts"><button class="btn" id="tryAdd"><svg class="i"><use href="#i-db"/></svg>Add more pictures</button><button class="btn btn--brand" id="tryDeploy"><svg class="i"><use href="#i-check"/></svg>Deploy this model</button></div>
+      </div>
+    </div>
+    <div class="panel labdet" id="labDetail" hidden></div>
+    <button class="nextcta" id="labGo"></button>
+    <p class="hint" style="text-align:center">Tip: pictures recorded in one go look alike, so scores can look very high. Record each gesture in 2–3 separate sessions (different light, distance, hand) for an honest test.</p>
+  </section>
+
+  <!-- ===== CODE view: blocks → upload → test on the robot ===== -->
+  <section class="codev" id="codeView" hidden>
+    <div class="code-bar">
+      <label class="cb-name"><svg class="i"><use href="#i-code"/></svg><input id="progName" maxlength="20" spellcheck="false" aria-label="Program name"></label>
+      <span class="tag" id="progState">Not uploaded</span>
+      <span class="upbar" id="upBar" hidden><i></i></span>
+      <span class="sp"></span>
+      <button class="btn" id="exBtn" title="Load the recommended program"><svg class="i"><use href="#i-bulb"/></svg><span>Example</span></button>
+      <button class="btn" id="upBtn"><svg class="i"><use href="#i-upload"/></svg><span>Upload</span></button>
+      <button class="btn btn--brand" id="runBtn"><svg class="i"><use href="#i-play"/></svg><span>Run</span></button>
+    </div>
+    <div class="code-grid">
+      <div class="ws">
+        <nav class="cats" id="cats" aria-label="Block categories"></nav>
+        <div id="blockly"></div>
+        <button class="ws-run" id="wsRun" title="Run the program on the robot"><svg class="i"><use href="#i-play"/></svg></button>
+        <div class="ws-msg" id="wsMsg"><i class="spin dark"></i><span>Loading the block editor…</span></div>
+      </div>
+      <aside class="testp" id="testSide">
+        <div class="panel">
+          <div class="panel__head"><h2><svg class="i"><use href="#i-bt"/></svg>Robot</h2><div class="r"><span class="tag" id="rbTag">Not connected</span></div></div>
+          <div class="panel__body">
+            <div class="rbchips" id="rbChips"></div>
+            <button class="btn btn--brand btn--block" id="rbConnect"><svg class="i"><use href="#i-bt"/></svg><span>Connect robot</span></button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel__head"><h2><svg class="i"><use href="#i-flask"/></svg>Test with each model</h2></div>
+          <div class="panel__body">
+            <div class="mpills" id="codePills"></div>
+            <div class="mini"><canvas id="codeCv"></canvas><div class="mini-off" data-camon><svg class="i"><use href="#i-cam"/></svg><b>Camera is off</b><button class="btn btn--brand btn--sm">Turn on camera</button></div><span class="mini-lbl" id="codeLbl"></span></div>
+            <p class="hint" style="margin-top:.6rem">Upload, press Run, then show your gestures. Switch models while it runs and see which one the robot follows best.</p>
+          </div>
+        </div>
+        <details class="panel more">
+          <summary><svg class="i"><use href="#i-motor"/></svg>Wiring check<svg class="i car"><use href="#i-chev"/></svg></summary>
+          <div class="panel__body" style="padding-top:0">
+            <div class="jog" id="jog">
+              <span></span><button data-jog="forward" title="Forward"><svg class="i"><use href="#i-up"/></svg></button><span></span>
+              <button data-jog="left" title="Spin left"><svg class="i"><use href="#i-left"/></svg></button><button data-jog="stop" title="Stop"><svg class="i"><use href="#i-stop"/></svg></button><button data-jog="right" title="Spin right"><svg class="i"><use href="#i-right"/></svg></button>
+              <span></span><button data-jog="backward" title="Reverse"><svg class="i"><use href="#i-down"/></svg></button><span></span>
+            </div>
+            <p class="hint" style="margin-top:.6rem">Hold a button and the wheels turn that way. Wrong way? Swap that motor's two wires on the L298N.</p>
+          </div>
+        </details>
+        <button class="nextcta" id="toLive"></button>
+      </aside>
+    </div>
+  </section>
+</div>
+
+<div class="modal" id="confirmModal" hidden>
+  <div class="modal__scrim" data-close></div>
+  <div class="modal__box"><h3 id="cfT">Are you sure?</h3><p id="cfP"></p><div class="modal__acts"><button class="btn" data-close>Cancel</button><button class="btn btn--brand" id="cfOk">Yes</button></div></div>
+</div>
+<div class="toasts" id="toasts"></div>
+
+<script type="module">
+import {FilesetResolver, HandLandmarker, FaceLandmarker, ImageEmbedder} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs";
+
+/* =====================================================================
+   SETTINGS YOU MAY WANT TO CHANGE
+   ===================================================================== */
+const COGNOSPACE_LOGO = "asserts/cognospace-logo.png";  // your logo file (same as Cogno Pilot)
+const FAVICON         = "asserts/icon.png";             // browser-tab icon (same as Cogno Pilot)
+const COGNOSPACE_URL  = "https://www.cognospace.in";
+const BLE_NAME_PREFIX = "CognoGesture";                 // must match DEVICE_NAME in the .ino
+const MAX_SAMPLES     = 300;                            // pictures kept per gesture
+const START_SPEED     = 40;                             // factory default PWM speed % (changeable in Collect → Robot speed)
+
+const WASM = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm";
+const HAND_MODEL = "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task";
+const FACE_MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
+const EMB_MODEL  = "https://storage.googleapis.com/mediapipe-models/image_embedder/mobilenet_v3_small/float32/1/mobilenet_v3_small.tflite";
+const SVC = "6e400001-b5a3-f393-e0a9-e50e24dcca9e", RXU = "6e400002-b5a3-f393-e0a9-e50e24dcca9e", TXU = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Math.random().toString(36).slice(2, 9);
+const isMobile = /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent);
+const LS = {
+  get(k, d){ try { const v = localStorage.getItem('cg.' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v){ try { localStorage.setItem('cg.' + k, JSON.stringify(v)); return true; } catch { return false; } },
+  del(k){ try { localStorage.removeItem('cg.' + k); } catch {} }
+};
+function toast(msg, kind=''){
+  const t = document.createElement('div'); t.className = 'toast ' + kind; t.textContent = msg; $('#toasts').appendChild(t);
+  while ($('#toasts').children.length > 3) $('#toasts').firstElementChild.remove();
+  setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 240); }, kind === 'bad' ? 5200 : 3200);
+}
+function confirmBox(title, text, okLabel='Yes', danger=/delete|clear|disconnect/i.test(okLabel)){
+  return new Promise(res => {
+    const m = $('#confirmModal'); $('#cfT').textContent = title; $('#cfP').textContent = text; $('#cfOk').textContent = okLabel; $('#cfOk').className = 'btn ' + (danger ? 'btn--danger' : 'btn--brand'); m.hidden = false;
+    const done = v => { m.hidden = true; $('#cfOk').onclick = null; $$('#confirmModal [data-close]').forEach(b => b.onclick = null); res(v); };
+    $('#cfOk').onclick = () => done(true); $$('#confirmModal [data-close]').forEach(b => b.onclick = () => done(false));
+  });
+}
+const b64enc = u8 => { let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); };
+const b64dec = s => { const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; };
+function logEvent(text){
+  const el = $('#log'); if (!el) return;
+  const d = document.createElement('div'), t = new Date();
+  d.innerHTML = `<span>${t.toTimeString().slice(0, 8)}</span>${esc(text)}`; el.prepend(d);
+  while (el.children.length > 80) el.lastElementChild.remove();
+}
+function setRange(el){ const p = (el.value - el.min) / (el.max - el.min) * 100; el.style.setProperty('--p', p + '%'); }
+
+/* ---------- logo + favicon ---------- */
+/* text logo used only if the logo file is missing */
+const WORDMARK = `<span class="wm"><svg viewBox="0 0 32 32"><defs><linearGradient id="wmg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F5821E"/><stop offset="1" stop-color="#E0457B"/></linearGradient></defs><circle cx="16" cy="16" r="7" fill="url(#wmg)"/><ellipse cx="16" cy="16" rx="14" ry="6" fill="none" stroke="url(#wmg)" stroke-width="2" transform="rotate(-25 16 16)"/></svg>COGNOSPACE</span>`;
+function renderLogos(){
+  for (const [sel, h] of [['#logoSlot', 'var(--logo-h)'], ['#footLogo', '34px']]){
+    const a = document.createElement('a');                  // the logo links to the CognoSpace website
+    a.className = 'logo-link'; a.href = COGNOSPACE_URL; a.target = '_blank'; a.rel = 'noopener'; a.title = 'Visit www.cognospace.in';
+    const img = new Image(); img.alt = 'CognoSpace'; img.src = COGNOSPACE_LOGO; img.style.height = h;
+    img.onerror = () => { a.innerHTML = WORDMARK; };        // file missing → text logo
+    a.appendChild(img); $(sel).replaceChildren(a);
+  }
+  const im = new Image(); im.onload = () => { $('#favIcon').href = FAVICON; }; im.src = FAVICON;
+}
+
+/* =====================================================================
+   STATE
+   ===================================================================== */
+const S = Object.assign({mode:'collect', view:'home', armed:false, trim:0, steady:3, strict:1, defSpeed:START_SPEED, testFrac:.2}, LS.get('settings', {}));
+S.view = 'home'; S.mode = 'collect';
+const saveSettings = () => LS.set('settings', {trim:S.trim, steady:S.steady, strict:S.strict, defSpeed:S.defSpeed, testFrac:S.testFrac});
+/* current PWM speed: starts at the default; a SPEED gesture changes it and it stays until another speed gesture */
+
+/* moves the robot can make: wheel multipliers [left, right] */
+const ACTIONS = {
+  forward: {label:'Forward',     icon:'i-up',    lr:[1, 1]},
+  backward:{label:'Reverse',     icon:'i-down',  lr:[-1, -1]},
+  left:    {label:'Turn left',   icon:'i-left',  lr:[-1, 1]},
+  right:   {label:'Turn right',  icon:'i-right', lr:[1, -1]},
+  curveL:  {label:'Forward left',  icon:'i-ul', lr:[.35, 1]},
+  curveR:  {label:'Forward right', icon:'i-ur', lr:[1, .35]},
+  backL:   {label:'Back left',     icon:'i-dl', lr:[-.35, -1]},
+  backR:   {label:'Back right',    icon:'i-dr', lr:[-1, -.35]},
+  stop:    {label:'Stop',        icon:'i-stop',  lr:[0, 0]},
+  speed:   {label:'Set speed',   icon:'i-gauge', lr:[0, 0]}      // a SPEED gesture: robot stops and the PWM speed changes
+};
+const ACT_ORDER = ['curveL', 'forward', 'curveR', 'left', 'stop', 'right', 'backL', 'backward', 'backR'];   // same layout as the direction pad
+const QUICK = [['Forward', 'forward', 0], ['Reverse', 'backward', 0], ['Left', 'left', 0], ['Right', 'right', 0], ['Forward left', 'curveL', 0], ['Forward right', 'curveR', 0], ['Back left', 'backL', 0], ['Back right', 'backR', 0], ['Stop', 'stop', 0], ['Speed 20%', 'speed', 20], ['Speed 40%', 'speed', 40], ['Speed 70%', 'speed', 70]];
+const COLORS = ['#22A55B', '#2E8BC0', '#7C3AED', '#F5821E', '#E0457B', '#0EA5A4', '#D99A00', '#4F46E5', '#DB2777', '#059669'];
+
+/* =====================================================================
+   CAMERA  (same controls as Cogno Pilot)
+   ===================================================================== */
+const camEl = $('#cam'), overlay = $('#overlay'), stage = $('#stage');
+const Cam = Object.assign({stream:null, facing:'user', devs:[], mirror:true, flipV:false, rot:false, zoom:1, swz:1, hwz:false}, LS.get('cam', {}));
+Cam.prefs = LS.get('lens', {});
+Cam.curId = function(){ return this.stream?.getVideoTracks()[0]?.getSettings().deviceId || ''; };
+Cam.track = function(){ return this.stream?.getVideoTracks()[0] || null; };
+Cam.classify = function(){
+  const backs = this.devs.filter(d => /back|rear|environment/i.test(d.label));
+  const num = d => { const m = /camera2?\s*(\d+)/i.exec(d.label); return m ? +m[1] : 50; };
+  const sorted = [...backs].sort((a, b) => num(a) - num(b));
+  const main = backs.find(d => d.deviceId === this.prefs.main) || backs.find(d => /^back camera$/i.test(d.label.trim()))
+    || sorted.find(d => !/ultra|wide|tele|depth|macro|dual|triple/i.test(d.label)) || sorted[0] || null;
+  const wide = backs.find(d => d.deviceId === this.prefs.wide) || backs.find(d => /ultra\s*wide/i.test(d.label))
+    || (/android/i.test(navigator.userAgent) ? sorted.find(d => d !== main && !/tele|depth|macro/i.test(d.label)) : null) || null;
+  return {backs, main, wide};
+};
+Cam.lensList = function(){
+  if (!this.stream) return [];
+  if (this.facing === 'user') return [1, 2];
+  const caps = this.track()?.getCapabilities?.() || {}, L = this.classify();
+  return [...((L.wide || (caps.zoom && caps.zoom.min <= .6)) ? [.5] : []), 1, 2];
+};
+Cam.open = async function(vc){
+  this.stream?.getTracks().forEach(t => t.stop());
+  try {
+    const s = await navigator.mediaDevices.getUserMedia({audio:false, video:{...vc, width:{ideal:1280}, height:{ideal:720}}});
+    this.stream = s; camEl.srcObject = s; await camEl.play().catch(() => {});
+    this.devs = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'videoinput');
+    const tr = s.getVideoTracks()[0], fm = tr.getSettings().facingMode;
+    if (fm) this.facing = fm === 'user' ? 'user' : 'environment'; else if (/front|user|face/i.test(tr.label)) this.facing = 'user';
+  } catch (e) {
+    this.stream = null; console.warn(e);
+    toast(e.name === 'NotAllowedError' ? 'Camera permission was blocked. Allow it in the browser settings.' : 'Camera error: ' + (e.message || e.name), 'bad');
+  }
+  this.label(); updateStage();
+};
+Cam.start = async function(facing){
+  if (facing) this.facing = facing;
+  this.zoom = 1; this.swz = 1;
+  if (this.facing === 'environment' && isMobile){
+    await this.open({facingMode:{ideal:'environment'}}); if (!this.stream) return;
+    const L = this.classify();                          // phones often open the ultra-wide by default
+    if (L.main && this.curId() !== L.main.deviceId) await this.open({deviceId:{exact:L.main.deviceId}});
+    await this.hw(1);
+  } else await this.open({facingMode:{ideal:this.facing}});
+  this.apply();
+};
+Cam.hw = async function(z){
+  const tr = this.track(), caps = tr?.getCapabilities?.() || {};
+  if (!caps.zoom){ this.hwz = false; return false; }
+  const v = clamp(z, caps.zoom.min, caps.zoom.max);
+  try { await tr.applyConstraints({advanced:[{zoom:v}]}); this.hwz = true; return Math.abs(v - z) < .05; } catch { this.hwz = false; return false; }
+};
+Cam.setLens = async function(z){
+  if (!this.stream) return;
+  const L = this.classify();
+  if (z === .5 && this.facing !== 'user'){
+    const caps = this.track()?.getCapabilities?.() || {};
+    if (caps.zoom && caps.zoom.min <= .6 && (!L.wide || this.curId() === L.main?.deviceId)){ await this.hw(caps.zoom.min); this.swz = 1; }
+    else if (L.wide){ if (this.curId() !== L.wide.deviceId) await this.open({deviceId:{exact:L.wide.deviceId}}); await this.hw(1); this.swz = 1; }
+    else { toast('This device has no ultra-wide camera available to the browser', 'warn'); return; }
+  } else {
+    if (this.facing !== 'user' && isMobile && L.main && this.curId() !== L.main.deviceId) await this.open({deviceId:{exact:L.main.deviceId}});
+    if (z === 1){ await this.hw(1); this.swz = 1; }
+    else { const ok = await this.hw(z); this.swz = ok ? 1 : z; if (!ok && this.hwz) await this.hw(1); }
+  }
+  this.zoom = z; this.apply(); this.label();
+};
+Cam.label = function(){
+  const tr = this.track(), el = $('#camLbl span'); if (!el) return;
+  el.textContent = !tr ? 'Camera off' : isMobile ? `${this.facing === 'user' ? 'Front' : 'Back'} · ${this.zoom}×` : (tr.label || 'Camera').replace(/\s*\(.*\)/, '').slice(0, 22) + (this.zoom !== 1 ? ` · ${this.zoom}×` : '');
+};
+Cam.switch = async function(){
+  if (isMobile || this.devs.length < 2) await this.start(this.facing === 'environment' ? 'user' : 'environment');
+  else { let i = this.devs.findIndex(d => d.deviceId === this.curId()); i = (i + 1) % this.devs.length; this.zoom = 1; this.swz = 1; await this.open({deviceId:{exact:this.devs[i].deviceId}}); this.apply(); }
+};
+Cam.stop = function(){ this.stream?.getTracks().forEach(t => t.stop()); this.stream = null; camEl.srcObject = null; this.label(); updateStage(); };
+Cam.power = async function(on){
+  if (on){ await this.start(); if (this.stream){ logEvent('Camera on'); AI.init(); } return; }
+  this.stop(); Engine.reset(); logEvent('Camera off');
+  if (Robot.running){ Robot.stop(); toast('Camera off. Program stopped.', 'warn'); } else toast('Camera off');
+};
+Cam.css = c => { const z = c.swz || 1; return `scale(${(c.mirror?-1:1)*(c.rot?-1:1)*z},${(c.flipV?-1:1)*(c.rot?-1:1)*z})`; };
+Cam.apply = function(){ camEl.style.transform = Cam.css(this); LS.set('cam', {mirror:this.mirror, flipV:this.flipV, rot:this.rot, facing:this.facing}); renderCamTools(); };
+Cam.action = function(a, v){
+  if (a === 'power') return this.power(!this.stream);
+  if (a === 'switch') return this.stream ? this.switch() : this.power(true);
+  if (a === 'lens') return this.setLens(+v);
+  if (a === 'mirror') this.mirror = !this.mirror;
+  if (a === 'flip') this.flipV = !this.flipV;
+  if (a === 'rot') this.rot = !this.rot;
+  this.apply();
+};
+function renderCamTools(){
+  const off = !Cam.stream;
+  $$('[data-cam]').forEach(b => {
+    const a = b.dataset.cam;
+    if (a === 'power'){ b.classList.toggle('off', off); b.title = off ? 'Turn camera on' : 'Turn camera off'; return; }
+    b.disabled = off && a !== 'switch';
+    b.classList.toggle('on', a === 'mirror' ? Cam.mirror : a === 'flip' ? Cam.flipV : a === 'rot' ? Cam.rot : false);
+  });
+  const lenses = Cam.lensList(), z = $('#zoomSeg');
+  z.hidden = lenses.length < 2;
+  z.innerHTML = lenses.map(l => `<button data-lens="${l}" class="${l === Cam.zoom ? 'on' : ''}">${l === .5 ? '.5' : l}×</button>`).join('');
+}
+
+/* frames for the AI: rotate / flip / zoom go into the picture, mirror is display-only */
+const proc = document.createElement('canvas'), pctx = proc.getContext('2d', {willReadFrequently:true});
+function grab(){
+  const vw = camEl.videoWidth, vh = camEl.videoHeight; if (!vw || !Cam.stream) return null;
+  const k = 480 / Math.max(vw, vh), W = Math.round(vw*k), H = Math.round(vh*k);
+  if (proc.width !== W || proc.height !== H){ proc.width = W; proc.height = H; }
+  const sx = Cam.rot ? -1 : 1, sy = (Cam.flipV ? -1 : 1) * (Cam.rot ? -1 : 1), z = Cam.swz || 1, cw = vw / z, ch = vh / z;
+  pctx.setTransform(sx, 0, 0, sy, sx < 0 ? W : 0, sy < 0 ? H : 0);
+  pctx.drawImage(camEl, (vw - cw)/2, (vh - ch)/2, cw, ch, 0, 0, W, H);
+  pctx.setTransform(1, 0, 0, 1, 0, 0);
+  return proc;
+}
+
+/* =====================================================================
+   AI  ·  MediaPipe Hand Landmarker (21 hand points) + Image Embedder
+   ===================================================================== */
+function setAI(state, txt){ $('#aiDot').dataset.state = state; $('#aiTxt').textContent = txt; }
+const AI = {
+  ready:false, loading:null, hands:null, handsImg:null, face:null, faceImg:null, faceLoading:null, embedder:null, vision:null, lastTs:0, lastFTs:0,
+  init(){
+    if (this.loading) return this.loading;
+    this.loading = (async () => {
+      setAI('busy', 'Loading AI…');
+      try {
+        this.vision = await FilesetResolver.forVisionTasks(WASM);
+        this.hands = await this.make(HandLandmarker, {baseOptions:{modelAssetPath:HAND_MODEL}, runningMode:'VIDEO', numHands:1, minHandDetectionConfidence:.35, minHandPresenceConfidence:.4, minTrackingConfidence:.4});
+        this.embedder = await this.make(ImageEmbedder, {baseOptions:{modelAssetPath:EMB_MODEL}, runningMode:'IMAGE', l2Normalize:true, quantize:false});
+        this.ready = true; setAI('ok', 'AI ready'); logEvent('AI models loaded');
+      } catch (e) { console.error(e); setAI('error', 'AI failed'); toast('Could not load the AI models. Check the internet connection.', 'bad'); this.loading = null; }
+    })();
+    return this.loading;
+  },
+  async make(Task, opts){
+    try { return await Task.createFromOptions(this.vision, {...opts, baseOptions:{...opts.baseOptions, delegate:'GPU'}}); }
+    catch { return await Task.createFromOptions(this.vision, {...opts, baseOptions:{...opts.baseOptions, delegate:'CPU'}}); }
+  },
+  detect(cv){
+    let ts = performance.now(); if (ts <= this.lastTs) ts = this.lastTs + 1; this.lastTs = ts;
+    const r = this.hands.detectForVideo(cv, ts); return r?.landmarks?.[0] || null;
+  },
+  /* face expressions: loaded only when a face gesture is trained or you are recording */
+  ensureFace(){
+    if (this.face || this.faceLoading || !this.vision) return;
+    this.faceLoading = this.make(FaceLandmarker, {baseOptions:{modelAssetPath:FACE_MODEL}, runningMode:'VIDEO', numFaces:1, outputFaceBlendshapes:true, minFaceDetectionConfidence:.5, minFacePresenceConfidence:.5, minTrackingConfidence:.5})
+      .then(f => { this.face = f; logEvent('Face expression model loaded'); }).catch(e => { console.warn(e); this.faceLoading = null; });
+  },
+  detectFace(cv){
+    if (!this.face) return null;
+    let ts = performance.now(); if (ts <= this.lastFTs) ts = this.lastFTs + 1; this.lastFTs = ts;
+    const r = this.face.detectForVideo(cv, ts), lm = r?.faceLandmarks?.[0], bs = r?.faceBlendshapes?.[0]?.categories;
+    return lm && bs ? {lm, bs} : null;
+  },
+  async detectFaceImage(cv){
+    try {
+      if (!this.faceImg) this.faceImg = await this.make(FaceLandmarker, {baseOptions:{modelAssetPath:FACE_MODEL}, runningMode:'IMAGE', numFaces:1, outputFaceBlendshapes:true});
+      const r = this.faceImg.detect(cv), lm = r?.faceLandmarks?.[0], bs = r?.faceBlendshapes?.[0]?.categories;
+      return lm && bs ? {lm, bs} : null;
+    } catch { return null; }
+  },
+  async detectImage(cv){
+    if (!this.handsImg) this.handsImg = await this.make(HandLandmarker, {baseOptions:{modelAssetPath:HAND_MODEL}, runningMode:'IMAGE', numHands:1, minHandDetectionConfidence:.35});
+    return this.handsImg.detect(cv)?.landmarks?.[0] || null;
+  },
+  sq:null, sqx:null,
+  embedBox(src, b){
+    if (!this.sq){ this.sq = document.createElement('canvas'); this.sq.width = this.sq.height = 224; this.sqx = this.sq.getContext('2d', {willReadFrequently:true}); }
+    this.sqx.fillStyle = '#808080'; this.sqx.fillRect(0, 0, 224, 224);
+    this.sqx.drawImage(src, b.x, b.y, b.s, b.s, 0, 0, 224, 224);
+    return Float32Array.from(this.embedder.embed(this.sq).embeddings[0].floatEmbedding);
+  }
+};
+
+/* hand points → a shape fingerprint (position, size and camera distance don't matter; direction does) */
+function handFeat(lm, W, H){
+  const a = W / H, w = lm[0], m = lm[9];
+  const s = Math.hypot((m.x - w.x)*a, m.y - w.y) || 1e-3, v = new Float32Array(63);
+  for (let i = 0; i < 21; i++){ v[i*3] = (lm[i].x - w.x)*a/s; v[i*3 + 1] = (lm[i].y - w.y)/s; v[i*3 + 2] = (lm[i].z - w.z)/s*.5; }
+  return v;
+}
+/* finger-state features, added to the 21 points so that 1, 2, 3, 4, 5 fingers look clearly different:
+   per finger: how far it reaches out (straight = 1, folded = small) + how bent its 2 joints are,
+   thumb tucked or not, and the gaps between neighbouring fingertips (V sign vs fingers together).
+   Worked out from the saved points, so old training data keeps working. */
+const FINGERS = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16], [17, 18, 19, 20]];
+function handX(h){
+  const P = i => [h[i*3], h[i*3 + 1], h[i*3 + 2]*2], sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+  const len = v => Math.hypot(v[0], v[1], v[2]), cos = (a, b) => (a[0]*b[0] + a[1]*b[1] + a[2]*b[2])/((len(a)*len(b)) || 1e-6);
+  const W = 3, out = new Float32Array(84); out.set(h); let o = 63;
+  for (const [a, b, c, d] of FINGERS){
+    const A = P(a), B = P(b), C = P(c), D = P(d);
+    const reach = len(D)/((len(A) + len(sub(B, A)) + len(sub(C, B)) + len(sub(D, C))) || 1e-6);
+    out[o++] = W*1.6*reach; out[o++] = W*cos(sub(B, A), sub(C, B)); out[o++] = W*cos(sub(C, B), sub(D, C));
+  }
+  const tip = i => P(i);
+  out[o++] = W*len(sub(tip(4), P(5))); out[o++] = W*len(sub(tip(4), P(9)));
+  for (const [i, j] of [[4, 8], [8, 12], [12, 16], [16, 20]]) out[o++] = W*.7*len(sub(tip(i), tip(j)));
+  return out;
+}
+/* the fingerprint a stored sample is compared with (hand samples get the finger-state features) */
+const featOf = (s, k) => k === 'h' ? (s.h ? (s.hx || (s.hx = handX(s.h))) : null) : s[k];
+/* face → expression fingerprint: 51 MediaPipe expression scores (smile, mouth open, brows up, wink…) */
+function faceFeat(face){ const v = new Float32Array(51); for (let i = 1; i < 52 && i < face.bs.length; i++) v[i - 1] = face.bs[i].score; return v; }
+function ptsBox(pts, W, H, k, minK=.25){
+  let x0 = 1, y0 = 1, x1 = 0, y1 = 0; for (const p of pts){ x0 = Math.min(x0, p.x); y0 = Math.min(y0, p.y); x1 = Math.max(x1, p.x); y1 = Math.max(y1, p.y); }
+  const s = clamp(Math.max((x1 - x0)*W, (y1 - y0)*H)*k, Math.min(W, H)*minK, Math.min(W, H));
+  const cx = (x0 + x1)/2*W, cy = (y0 + y1)/2*H;
+  return {x:clamp(cx - s/2, 0, W - s), y:clamp(cy - s/2, 0, H - s), s};
+}
+/* where the OBJECT picture is taken: around the hand (objects are usually held), else the middle of the view */
+function cropBox(lm, W, H){
+  if (!lm){ const s = Math.min(W, H)*.9; return {x:(W - s)/2, y:(H - s)/2, s}; }
+  return ptsBox(lm, W, H, 2.2, .35);
+}
+
+/* =====================================================================
+   MODEL  ·  your gestures + KNN (k nearest neighbours)
+   Every sample keeps two fingerprints:
+     h = hand shape (21 points)  → used when the gesture is a hand sign
+     e = picture fingerprint     → used for objects / cards you hold up
+   ===================================================================== */
+const Model = {
+  classes:[], T:{h:.6, f:.3},
+  bg(){ return this.classes.find(c => c.bg); },
+  byId(id){ return this.classes.find(c => c.id === id); },
+  reset(){ this.classes = [{id:'bg', name:'No gesture', bg:true, color:'#94A3B8', action:'stop', speed:0, by:'auto', samples:[], thumbs:[]}]; },
+  add(name, action='forward', speed=0){
+    const used = this.classes.map(c => c.color), color = COLORS.find(c => !used.includes(c)) || COLORS[this.classes.length % COLORS.length];
+    const c = {id:uid(), name, bg:false, color, action, speed:action === 'speed' ? (speed || 40) : 0, by:'auto', samples:[], thumbs:[]};
+    this.classes.push(c); this.changed(); return c;
+  },
+  remove(id){ this.classes = this.classes.filter(c => c.id !== id || c.bg); this.changed(); },
+  /* what a gesture is recognised by: hand shape, face expression or the object picture.
+     "Auto" decides from the recorded pictures; the user can force it on the card. */
+  autoMode(c){
+    const n = c.samples.length; if (!n) return 'none';
+    const h = c.samples.filter(s => s.h).length / n, f = c.samples.filter(s => s.f).length / n;
+    return h >= .6 ? 'hand' : (f >= .6 && h < .3) ? 'face' : 'image';
+  },
+  mode(c){ return c.by && c.by !== 'auto' ? c.by : this.autoMode(c); },
+  trained(){ return this.classes.filter(c => !c.bg && c.samples.length >= 5); },
+  total(){ return this.classes.reduce((a, c) => a + c.samples.length, 0); },
+  has(m){ return this.classes.some(c => !c.bg && c.samples.length && this.mode(c) === m); },
+  /* auto thresholds: how far from your samples a hand shape / expression may be and still count */
+  calib(){
+    for (const [k, off, lo, hi] of [['h', .14, .3, 1.3], ['f', .05, .12, .8]]){
+      const ds = [];
+      for (const c of this.classes){
+        const vs = c.samples.map(s => featOf(s, k)).filter(Boolean); if (vs.length < 3) continue;
+        const step = Math.max(1, Math.floor(vs.length / 40));
+        for (let i = 0; i < vs.length; i += step){ let best = 1e9; for (let j = 0; j < vs.length; j++){ if (j === i) continue; const d = dist(vs[i], vs[j]); if (d < best) best = d; } ds.push(best); }
+      }
+      ds.sort((a, b) => a - b);
+      this.T[k] = clamp((ds.length ? ds[ds.length >> 1] : (k === 'h' ? .15 : .06))*3.2 + off, lo, hi);
+    }
+  },
+  /* KNN on hand shapes or face expressions (k = 5 nearest), with "No gesture" samples as the "none of these" answer */
+  byVec(key, mode, f, word){
+    const K = 5, top = [];
+    for (const c of this.classes){
+      if (!c.bg && this.mode(c) !== mode) continue;
+      for (const s of c.samples){ const v = s[key]; if (!v) continue; const d = dist(f, v);
+        if (top.length < K){ top.push({d, c}); top.sort((a, b) => a.d - b.d); } else if (d < top[K-1].d){ top[K-1] = {d, c}; top.sort((a, b) => a.d - b.d); } }
+    }
+    if (!top.length) return null;
+    const T = this.T[key] * [1.35, 1, .75][S.strict], d1 = top[0].d;
+    const vote = new Map(); let tot = 0;
+    for (const t of top){ const w = 1/(t.d + .05); vote.set(t.c, (vote.get(t.c) || 0) + w); tot += w; }
+    let best = null, bw = 0; for (const [c, w] of vote) if (w > bw){ bw = w; best = c; }
+    const share = bw/tot, list = [...vote].map(([c, w]) => ({c, p:w/tot})).sort((a, b) => b.p - a.p);
+    if (d1 > T) return {c:null, why:`Not a trained ${word}`, list};
+    if (share < .6) return {c:null, why:`Not sure which ${word}`, list};
+    if (best.bg) return {c:null, why:`No gesture (${word} looks normal)`, list};
+    return {c:best, conf:share*clamp(1.1 - .5*d1/T, .4, 1), list, by:mode};
+  },
+  /* picture KNN: objects, cards, toys, pictures… (cosine similarity of MediaPipe image fingerprints) */
+  byImage(e){
+    const K = 7, top = [], mx = new Map(); let bgMx = 0;
+    for (const c of this.classes){
+      if (!c.bg && this.mode(c) !== 'image') continue;
+      for (const s of c.samples){ let d = 0; for (let j = 0; j < e.length; j++) d += e[j]*s.e[j];
+        if (d > (mx.get(c) ?? -1)) mx.set(c, d); if (c.bg && d > bgMx) bgMx = d;
+        if (top.length < K){ top.push({d, c}); top.sort((a, b) => b.d - a.d); } else if (d > top[K-1].d){ top[K-1] = {d, c}; top.sort((a, b) => b.d - a.d); } }
+    }
+    if (!top.length) return null;
+    const d0 = top[0].d, vote = new Map(); let tot = 0;
+    for (const t of top){ const w = Math.exp(12*(t.d - d0)); vote.set(t.c, (vote.get(t.c) || 0) + w); tot += w; }
+    const list = [...vote].map(([c, w]) => ({c, p:w/tot})).sort((a, b) => b.p - a.p), t = list[0], m = mx.get(t.c) || 0;
+    const need = [.55, .62, .7][S.strict];
+    if (t.c.bg || t.p < .6 || m < need || m - bgMx < .03) return {c:null, why:t.c.bg ? 'Nothing trained in view' : 'Not sure which object', list};
+    return {c:t.c, conf:t.p*clamp((m - bgMx)*8 + .5, .5, 1), list, by:'image'};
+  },
+  /* combine hand + face + object answers. Two different gestures at once → stop (safe). */
+  decide(rs){
+    const ok = rs.filter(r => r && r.c).sort((a, b) => b.conf - a.conf);
+    const all = rs.filter(Boolean), list = all.flatMap(r => r.list || []).sort((a, b) => b.p - a.p).filter((x, i, arr) => arr.findIndex(y => y.c === x.c) === i);
+    if (!ok.length) return {c:null, why:(all.find(r => r.why) || {}).why, list};
+    if (ok.length > 1 && ok[1].c !== ok[0].c && ok[0].conf - ok[1].conf < .15) return {c:null, why:`Two gestures at once (${ok[0].c.name} + ${ok[1].c.name})`, list};
+    return {...ok[0], list};
+  },
+  /* ---- save / load (localStorage, compact) ---- */
+  pack(){
+    return {v:1, classes:this.classes.map(c => {
+      const n = c.samples.length, e8 = new Int8Array(n*1024), h16 = new Int16Array(n*63), f16 = new Int16Array(n*51); let mask = '', fmask = '';
+      c.samples.forEach((s, i) => {
+        let m = 1e-9; for (const x of s.e) m = Math.max(m, Math.abs(x)); for (let j = 0; j < 1024; j++) e8[i*1024 + j] = Math.round((s.e[j] || 0)/m*127);
+        if (s.h){ mask += '1'; for (let j = 0; j < 63; j++) h16[i*63 + j] = Math.round(clamp(s.h[j], -32, 32)*1000); } else mask += '0';
+        if (s.f){ fmask += '1'; for (let j = 0; j < 51; j++) f16[i*51 + j] = Math.round(clamp(s.f[j], 0, 1)*10000); } else fmask += '0';
+      });
+      return {id:c.id, name:c.name, bg:!!c.bg, color:c.color, action:c.action, speed:c.speed, by:c.by || 'auto', thumbs:c.thumbs, n, e:b64enc(new Uint8Array(e8.buffer)), h:b64enc(new Uint8Array(h16.buffer)), mask, f:b64enc(new Uint8Array(f16.buffer)), fmask};
+    })};
+  },
+  unpack(j){
+    if (!j || !Array.isArray(j.classes)) throw new Error('Not a Cogno Gesture file');
+    this.classes = j.classes.map(c => {
+      const e8 = new Int8Array(b64dec(c.e || '').buffer), h16 = new Int16Array(b64dec(c.h || '').buffer), f16 = new Int16Array(b64dec(c.f || '').buffer), samples = [];
+      for (let i = 0; i < (c.n || 0); i++){
+        const e = new Float32Array(1024); let s2 = 0; for (let k = 0; k < 1024; k++){ e[k] = e8[i*1024 + k]; s2 += e[k]*e[k]; } s2 = Math.sqrt(s2) || 1; for (let k = 0; k < 1024; k++) e[k] /= s2;
+        let h = null; if (c.mask?.[i] === '1'){ h = new Float32Array(63); for (let k = 0; k < 63; k++) h[k] = h16[i*63 + k]/1000; }
+        let f = null; if (c.fmask?.[i] === '1'){ f = new Float32Array(51); for (let k = 0; k < 51; k++) f[k] = f16[i*51 + k]/10000; }
+        samples.push({e, h, f});
+      }
+      return {id:c.id || uid(), name:c.name || 'Gesture', bg:!!c.bg, color:c.color || COLORS[0], action:ACTIONS[c.action] ? c.action : 'stop', speed:c.action === 'speed' ? (+c.speed || 40) : 0, by:['hand', 'face', 'image'].includes(c.by) ? c.by : 'auto', thumbs:c.thumbs || [], samples};
+    });
+    if (!this.bg()) this.classes.unshift({id:'bg', name:'No gesture', bg:true, color:'#94A3B8', action:'stop', speed:0, by:'auto', samples:[], thumbs:[]});
+    this.calib();
+  },
+  /* a fingerprint of the data: if it changes, trained models are out of date */
+  sig(){ return this.classes.map(c => c.id + ':' + c.samples.length + ':' + this.mode(c)).join('|'); },
+  saveT:null,
+  changed(){ clearTimeout(this.saveT); this.saveT = setTimeout(() => this.save(), 400); this.calib(); const t = document.getElementById('saveTag'); if (t){ t.textContent = 'Saving…'; t.className = 'tag'; } Code.cache = null; renderModelUI(); },
+  savedAt:LS.get('savedAt', 0), bytes:0,
+  save(){
+    const j = JSON.stringify(this.pack());
+    let ok = true; try { localStorage.setItem('cg.data', j); } catch { ok = false; }
+    if (ok){ this.savedAt = Date.now(); this.bytes = j.length; LS.set('savedAt', this.savedAt); }
+    else toast('Browser storage is full. Use Export to keep a copy, or delete some pictures.', 'warn');
+    renderData(ok);
+  },
+  load(){ let raw = null; try { raw = localStorage.getItem('cg.data'); } catch {} this.bytes = raw ? raw.length : 0; if (raw){ try { this.unpack(JSON.parse(raw)); return; } catch (e) { console.warn(e); } } this.reset(); }
+};
+function dist(a, b){ let s = 0; for (let i = 0; i < a.length; i++){ const d = a[i] - b[i]; s += d*d; } return Math.sqrt(s*3/a.length); }
+
+/* =====================================================================
+   4 ALGORITHMS  ·  all run on this device, on the MediaPipe fingerprints
+     KNN · Neural Network · SVM · Random Forest
+   Each one: train(dataset, progress) → model,  predict(model, x) → probabilities
+   ===================================================================== */
+function rng(seed){ let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0)/4294967296; }; }
+function shuffle(a, R){ for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(R()*(i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function dot(a, b){ let s = 0; for (let i = 0; i < a.length; i++) s += a[i]*b[i]; return s; }
+/* standardise features (mean 0, spread 1) so NN and SVM learn evenly */
+function fitStd(X){
+  const n = X.length, d = X[0].length, mu = new Float32Array(d), sd = new Float32Array(d);
+  for (const x of X) for (let i = 0; i < d; i++) mu[i] += x[i];
+  for (let i = 0; i < d; i++) mu[i] /= n;
+  for (const x of X) for (let i = 0; i < d; i++){ const v = x[i] - mu[i]; sd[i] += v*v; }
+  let avg = 0; for (let i = 0; i < d; i++){ sd[i] = Math.sqrt(sd[i]/n); avg += sd[i]; } avg /= d;
+  for (let i = 0; i < d; i++) sd[i] = Math.max(sd[i], avg*.1 + 1e-6);
+  return {mu, sd};
+}
+function stdz(x, s){ const o = new Float32Array(x.length); for (let i = 0; i < x.length; i++) o[i] = (x[i] - s.mu[i])/s.sd[i]; return o; }
+function softmax(o, T=1){ let m = -Infinity; for (const v of o) if (v > m) m = v; let s = 0; for (let i = 0; i < o.length; i++){ o[i] = Math.exp((o[i] - m)*T); s += o[i]; } for (let i = 0; i < o.length; i++) o[i] /= s; return o; }
+
+const ALGOS = {
+  knn:{
+    name:'KNN', short:'KNN', icon:'i-knn', color:'#2E8BC0', tech:'k = 5 · vote',
+    desc:'k-Nearest Neighbours: finds the 5 most similar pictures it has already seen and lets them vote.',
+    async train(ds, prog){ prog(1); return {X:ds.X, y:ds.y, C:ds.C, cos:ds.metric === 'cos'}; },
+    predict(m, x){
+      const K = Math.min(5, m.X.length), top = [];
+      for (let i = 0; i < m.X.length; i++){
+        const d = m.cos ? 1 - dot(x, m.X[i]) : dist(x, m.X[i]);
+        if (top.length < K){ top.push([d, m.y[i]]); top.sort((a, b) => a[0] - b[0]); }
+        else if (d < top[K-1][0]){ top[K-1] = [d, m.y[i]]; top.sort((a, b) => a[0] - b[0]); }
+      }
+      const p = new Float32Array(m.C); let t = 0;
+      for (const [d, c] of top){ const w = 1/(d + (m.cos ? .02 : .05)); p[c] += w; t += w; }
+      for (let i = 0; i < m.C; i++) p[i] /= t || 1;
+      return p;
+    }
+  },
+  nn:{
+    name:'Neural Network', short:'NN', icon:'i-nn', color:'#7C3AED', tech:'MLP · 1 hidden layer',
+    desc:'A small brain of artificial neurons that learns the pattern by practising again and again.',
+    async train(ds, prog){
+      const s = fitStd(ds.X), X = ds.X.map(x => stdz(x, s)), y = ds.y, n = X.length, d = X[0].length, C = ds.C;
+      const big = d > 200, H = big ? 16 : 32, E = big ? 22 : 60, B = 16, lr = big ? .004 : .01, wd = 1e-4, R = rng(7);
+      const init = (len, fan) => { const a = new Float32Array(len), k = Math.sqrt(6/fan); for (let i = 0; i < len; i++) a[i] = (R()*2 - 1)*k; return a; };
+      const W1 = init(H*d, d + H), b1 = new Float32Array(H), W2 = init(C*H, H + C), b2 = new Float32Array(C);
+      const P = [W1, b1, W2, b2], G = P.map(p => new Float32Array(p.length)), M1 = P.map(p => new Float32Array(p.length)), M2 = P.map(p => new Float32Array(p.length));
+      const [gW1, gb1, gW2, gb2] = G, h = new Float32Array(H), o = new Float32Array(C), dh = new Float32Array(H), idx = [...Array(n).keys()], losses = [];
+      let t = 0, bi = 0;
+      for (let ep = 0; ep < E; ep++){
+        shuffle(idx, R); let L = 0;
+        for (let b0 = 0; b0 < n; b0 += B){
+          for (const g of G) g.fill(0);
+          const bn = Math.min(B, n - b0);
+          for (let q = b0; q < b0 + bn; q++){
+            const x = X[idx[q]], yy = y[idx[q]];
+            for (let j = 0; j < H; j++){ let v = b1[j]; const off = j*d; for (let i = 0; i < d; i++) v += x[i]*W1[off + i]; h[j] = v > 0 ? v : 0; }
+            for (let k = 0; k < C; k++){ let v = b2[k]; const off = k*H; for (let j = 0; j < H; j++) v += h[j]*W2[off + j]; o[k] = v; }
+            softmax(o); L -= Math.log(o[yy] + 1e-9); o[yy] -= 1;
+            dh.fill(0);
+            for (let k = 0; k < C; k++){ const g = o[k], off = k*H; gb2[k] += g; for (let j = 0; j < H; j++){ gW2[off + j] += g*h[j]; dh[j] += g*W2[off + j]; } }
+            for (let j = 0; j < H; j++){ if (h[j] <= 0) continue; const g = dh[j], off = j*d; gb1[j] += g; for (let i = 0; i < d; i++) gW1[off + i] += g*x[i]; }
+          }
+          t++; const c1 = 1 - Math.pow(.9, t), c2 = 1 - Math.pow(.999, t);
+          for (let pi = 0; pi < 4; pi++){
+            const p = P[pi], g = G[pi], m1 = M1[pi], m2 = M2[pi];
+            for (let i = 0; i < p.length; i++){ const gi = g[i]/bn + wd*p[i]; m1[i] = .9*m1[i] + .1*gi; m2[i] = .999*m2[i] + .001*gi*gi; p[i] -= lr*(m1[i]/c1)/(Math.sqrt(m2[i]/c2) + 1e-8); }
+          }
+          if ((++bi & 31) === 0) await sleep(0);
+        }
+        losses.push(L/n); prog((ep + 1)/E, losses.slice()); await sleep(0);
+        if (L/n < .015 && ep > 8){ prog(1, losses.slice()); break; }      // learned it: stop early
+      }
+      return {s, W1, b1, W2, b2, H, d, C};
+    },
+    predict(m, x){
+      const xs = stdz(x, m.s), h = new Float32Array(m.H), o = new Float32Array(m.C);
+      for (let j = 0; j < m.H; j++){ let v = m.b1[j]; const off = j*m.d; for (let i = 0; i < m.d; i++) v += xs[i]*m.W1[off + i]; h[j] = v > 0 ? v : 0; }
+      for (let k = 0; k < m.C; k++){ let v = m.b2[k]; const off = k*m.H; for (let j = 0; j < m.H; j++) v += h[j]*m.W2[off + j]; o[k] = v; }
+      return softmax(o);
+    }
+  },
+  svm:{
+    name:'SVM', short:'SVM', icon:'i-svm', color:'#0EA5A4', tech:'linear · one-vs-rest',
+    desc:'Support Vector Machine: draws the widest possible dividing line between each gesture and all the others.',
+    async train(ds, prog){
+      const s = fitStd(ds.X), X = ds.X.map(x => stdz(x, s)), y = ds.y, n = X.length, d = X[0].length, C = ds.C;
+      const W = new Float32Array(C*d), b = new Float32Array(C), R = rng(5), idx = [...Array(n).keys()], E = d > 200 ? 20 : 40;
+      for (let ep = 0; ep < E; ep++){
+        const eta = .6/(1 + ep*.15), lr = eta/d;
+        shuffle(idx, R);
+        for (const i of idx){
+          const x = X[i];
+          for (let k = 0; k < C; k++){
+            const off = k*d; let sc = b[k]; for (let j = 0; j < d; j++) sc += W[off + j]*x[j];
+            const tt = y[i] === k ? 1 : -1;
+            if (tt*sc < 1){ const g = lr*tt; for (let j = 0; j < d; j++) W[off + j] += g*x[j]; b[k] += .05*eta*tt; }   // hinge loss: push the line away
+          }
+        }
+        const shrink = 1 - .02*eta; for (let j = 0; j < W.length; j++) W[j] *= shrink;            // keep the margin wide
+        prog((ep + 1)/E); await sleep(0);
+      }
+      return {s, W, b, d, C};
+    },
+    predict(m, x){
+      const xs = stdz(x, m.s), o = new Float32Array(m.C);
+      for (let k = 0; k < m.C; k++){ let v = m.b[k]; const off = k*m.d; for (let j = 0; j < m.d; j++) v += m.W[off + j]*xs[j]; o[k] = v; }
+      return softmax(o, 2.5);
+    }
+  },
+  rf:{
+    name:'Random Forest', short:'Forest', icon:'i-tree', color:'#22A55B', tech:'25 decision trees',
+    desc:'25 decision trees each ask yes / no questions about the picture, then they all vote.',
+    async train(ds, prog){
+      const {X, y, C} = ds, n = X.length, d = X[0].length, R = rng(11), T = 25, mtry = Math.max(3, Math.round(Math.sqrt(d))), maxD = 12, trees = [];
+      const gini = c => { let t = 0, s = 0; for (const v of c) t += v; if (!t) return 0; for (const v of c) s += (v/t)*(v/t); return (1 - s)*t; };
+      const leaf = (cnt, len) => { for (let k = 0; k < C; k++) cnt[k] /= len; return {p:cnt}; };
+      const grow = (idx, depth) => {
+        const cnt = new Float32Array(C); for (const i of idx) cnt[y[i]]++;
+        let kinds = 0; for (const v of cnt) if (v) kinds++;
+        if (kinds <= 1 || depth >= maxD || idx.length < 4) return leaf(cnt, idx.length);
+        let best = null, bestG = gini(cnt) - 1e-9; const L = new Float32Array(C), Rr = new Float32Array(C);
+        for (let q = 0; q < mtry; q++){
+          const f = Math.floor(R()*d);
+          for (let r = 0; r < 6; r++){
+            const a = idx[Math.floor(R()*idx.length)], b = idx[Math.floor(R()*idx.length)], th = (X[a][f] + X[b][f])/2;
+            L.fill(0); for (const i of idx) if (X[i][f] <= th) L[y[i]]++;
+            for (let k = 0; k < C; k++) Rr[k] = cnt[k] - L[k];
+            const g = gini(L) + gini(Rr); if (g < bestG){ bestG = g; best = {f, th}; }
+          }
+        }
+        if (!best) return leaf(cnt, idx.length);
+        const li = [], ri = []; for (const i of idx) (X[i][best.f] <= best.th ? li : ri).push(i);
+        if (!li.length || !ri.length) return leaf(cnt, idx.length);
+        return {f:best.f, t:best.th, l:grow(li, depth + 1), r:grow(ri, depth + 1)};
+      };
+      for (let t = 0; t < T; t++){
+        const boot = Array.from({length:n}, () => Math.floor(R()*n));          // each tree sees a random re-sample
+        trees.push(grow(boot, 0)); prog((t + 1)/T); if (t & 1) await sleep(0);
+      }
+      return {trees, C};
+    },
+    predict(m, x){
+      const p = new Float32Array(m.C);
+      for (let node of m.trees){ while (!node.p) node = x[node.f] <= node.t ? node.l : node.r; for (let k = 0; k < m.C; k++) p[k] += node.p[k]; }
+      for (let k = 0; k < m.C; k++) p[k] /= m.trees.length;
+      return p;
+    }
+  }
+};
+const ALGO_KEYS = Object.keys(ALGOS);
+
+/* one dataset per kind of gesture: hand signs, face expressions, objects */
+const MODS = [['hand', 'h', 'hand sign'], ['face', 'f', 'expression'], ['image', 'e', 'object']];
+function buildData(m, k){
+  const cls = Model.classes.filter(c => c.bg ? c.samples.some(s => s[k]) : Model.mode(c) === m && c.samples.filter(s => s[k]).length >= 5);
+  if (!cls.some(c => !c.bg)) return null;
+  const X = [], y = [];
+  cls.forEach((c, ci) => c.samples.forEach(s => { const v = featOf(s, k); if (v){ X.push(v); y.push(ci); } }));
+  return {m, k, X, y, ids:cls.map(c => c.id), C:cls.length, metric:k === 'e' ? 'cos' : 'euc'};
+}
+function splitData(ds, frac, seed){
+  const R = rng(seed), tr = [], te = [];
+  for (let ci = 0; ci < ds.C; ci++){
+    const idx = shuffle(ds.y.map((v, i) => v === ci ? i : -1).filter(i => i >= 0), R);
+    const nt = idx.length >= 2 ? clamp(Math.round(idx.length*frac), 1, idx.length - 1) : 0;
+    idx.forEach((i, j) => (j < nt ? te : tr).push(i));
+  }
+  const sub = I => ({...ds, X:I.map(i => ds.X[i]), y:I.map(i => ds.y[i])});
+  return {train:sub(tr), test:sub(te)};
+}
+const fmtPct = v => (v*100).toFixed(v >= .9995 || v === 0 ? 0 : 1) + '%';
+const fmtMs = ms => ms < 1 ? ms.toFixed(2) + ' ms' : ms < 1000 ? Math.round(ms) + ' ms' : (ms/1000).toFixed(1) + ' s';
+
+/* =====================================================================
+   BRAIN  ·  every model can be prepared (trained on all data) and tried;
+   one of them is DEPLOYED: Live only unlocks with a deployed model.
+   ===================================================================== */
+const Brain = {
+  dep:LS.get('deploy', null),           // {key, acc, sig}  the deployed model
+  probe:null,                            // the model being tried in Train / tested in Code
+  fitted:{}, jobs:{},
+  key(){ return S.mode === 'live' ? (this.dep?.key || 'knn') : (this.probe || this.dep?.key || 'knn'); },
+  ready(key){ const f = this.fitted[key]; return !!f && f.sig === Model.sig(); },
+  busy(key){ return !!this.jobs[key]; },
+  deployed(){ return !!this.dep && this.dep.sig === Model.sig() && labSets().length > 0; },
+  async ensure(key){
+    if (!key || this.ready(key)) return;
+    if (this.jobs[key]) return this.jobs[key];
+    const sig = Model.sig();
+    this.jobs[key] = (async () => {
+      const models = {};
+      if (key !== 'knn') for (const [m, k] of MODS){ const ds = buildData(m, k); if (ds) models[m] = {ids:ds.ids, model:await ALGOS[key].train(ds, () => {})}; await sleep(0); }
+      this.fitted[key] = {sig, models};
+    })().catch(e => { console.warn(e); toast('Could not prepare ' + ALGOS[key].name, 'bad'); }).finally(() => { delete this.jobs[key]; renderModelUI(); });
+    renderModelUI();
+    return this.jobs[key];
+  },
+  async deploy(key){
+    if (!labSets().length){ toast('Record at least 5 pictures for a gesture first', 'warn'); return; }
+    await this.ensure(key); if (!this.ready(key)) return;
+    this.dep = {key, acc:Lab.res[key]?.state === 'done' ? Lab.res[key].acc : null, sig:Model.sig()}; LS.set('deploy', this.dep);
+    if (!this.probe) this.probe = key;
+    logEvent(`${ALGOS[key].name} deployed`); renderModelUI();
+    toast(`${ALGOS[key].name} deployed. Code and Live are unlocked.`, 'ok');
+  },
+  /* one kind of input (hand / face / object) → {c, conf, list} or {c:null, why} */
+  classify(m, k, word, feat){
+    // 1) safety: how close is this to anything you recorded? (far away = unknown)
+    const cos = k === 'e', K = 5, top = []; let bestReal = 1e9, bestBg = 1e9;
+    for (const c of Model.classes){
+      if (!c.bg && Model.mode(c) !== m) continue;
+      for (const s of c.samples){ const v = featOf(s, k); if (!v) continue;
+        const d = cos ? 1 - dot(feat, v) : dist(feat, v);
+        if (c.bg){ if (d < bestBg) bestBg = d; } else if (d < bestReal) bestReal = d;
+        if (top.length < K){ top.push({d, c}); top.sort((a, b) => a.d - b.d); } else if (d < top[K-1].d){ top[K-1] = {d, c}; top.sort((a, b) => a.d - b.d); } }
+    }
+    if (!top.length) return null;
+    // 2) the chosen algorithm votes (KNN until another model is ready)
+    const key = this.key(); let probs; const M = key !== 'knn' && this.ready(key) && this.fitted[key].models[m];
+    if (M){ const p = ALGOS[key].predict(M.model, feat); probs = M.ids.map((id, i) => ({c:Model.byId(id), p:p[i]})).filter(x => x.c); }
+    else { const vote = new Map(); let tot = 0; for (const t of top){ const w = 1/(t.d + (cos ? .02 : .05)); vote.set(t.c, (vote.get(t.c) || 0) + w); tot += w; } probs = [...vote].map(([c, w]) => ({c, p:w/tot})); }
+    probs.sort((a, b) => b.p - a.p);
+    const list = probs.filter(x => x.p > .005), best = probs[0];
+    // 3) unknown / unsure → nothing seen
+    if (cos){ if (1 - bestReal < [.55, .62, .7][S.strict] || (bestBg < 1e8 && bestBg - bestReal < .03)) return {c:null, why:'Nothing trained in view', list}; }
+    else if (top[0].d > Model.T[k]*[1.35, 1, .75][S.strict]) return {c:null, why:`Not a trained ${word}`, list};
+    if (!best || best.c.bg) return {c:null, why:cos ? 'Nothing trained in view' : `No gesture (${word} looks normal)`, list};
+    if (best.p < [.5, .6, .68][S.strict]) return {c:null, why:`Not sure which ${word}`, list};
+    return {c:best.c, conf:best.p, list, by:m};
+  }
+};
+
+/* =====================================================================
+   LAB  ·  train all 4 on the same split, test on hidden pictures
+   ===================================================================== */
+const Lab = {res:{}, running:false, sig:'', focus:null, step:0, trying:false};
+const labSets = () => MODS.map(([m, k]) => buildData(m, k)).filter(Boolean);
+function labBest(){
+  if (Lab.running) return null;
+  let b = null; for (const k of ALGO_KEYS){ const r = Lab.res[k]; if (r?.state === 'done' && (!b || r.acc > Lab.res[b].acc + 1e-9 || (Math.abs(r.acc - Lab.res[b].acc) < 1e-9 && r.predMs < Lab.res[b].predMs))) b = k; }
+  return b;
+}
+async function runLab(){
+  if (Lab.running) return;
+  const sets = labSets();
+  if (!sets.length){ toast('Record at least 5 pictures for a gesture in Collect first', 'warn'); return; }
+  Lab.running = true; Lab.res = {}; Lab.sig = Model.sig(); Lab.focus = null; Lab.step = 0;
+  const seed = (Math.random()*1e9) | 0, splits = sets.map(ds => splitData(ds, S.testFrac, seed));
+  renderLab(); logEvent('Training and testing 4 models');
+  for (const key of ALGO_KEYS){
+    const A = ALGOS[key], r = Lab.res[key] = {state:'train', p:0, losses:[]}; Lab.step++; renderAlgo(key); renderRunBtn();
+    let ok = 0, tot = 0, trainMs = 0, predMs = 0; const conf = new Map(), P = splits.length;
+    for (let si = 0; si < P; si++){
+      const {train, test} = splits[si]; let t0 = performance.now();
+      const model = await A.train(train, (p, losses) => { r.p = (si + p*.75)/P; if (losses) r.losses = losses; renderAlgoProgress(key); });
+      trainMs += performance.now() - t0;
+      for (let i = 0; i < test.X.length; i++){
+        t0 = performance.now(); const pr = A.predict(model, test.X[i]); predMs += performance.now() - t0;
+        let b = 0; for (let j = 1; j < pr.length; j++) if (pr[j] > pr[b]) b = j;
+        const tid = test.ids[test.y[i]], pid = test.ids[b], key2 = tid + '|' + pid;
+        if (tid === pid) ok++; tot++; conf.set(key2, (conf.get(key2) || 0) + 1);
+        if (i % 25 === 24){ r.p = (si + .75 + .25*(i + 1)/test.X.length)/P; renderAlgoProgress(key); await sleep(0); }
+      }
+    }
+    Object.assign(r, {state:'done', p:1, acc:tot ? ok/tot : 0, ok, tot, trainMs, predMs:tot ? predMs/tot : 0, conf});
+    logEvent(`${A.name}: ${fmtPct(r.acc)} (${ok}/${tot} test pictures)`);
+    renderAlgo(key); await sleep(key === ALGO_KEYS[ALGO_KEYS.length - 1] ? 1000 : 450);
+  }
+  Lab.running = false; Lab.focus = labBest(); renderLab();
+  const b = ALGOS[Lab.focus];
+  toast(`${b.name} scored best with ${fmtPct(Lab.res[Lab.focus].acc)}. Try them on the camera, then deploy one.`, 'ok');
+  setTimeout(() => $('#labDetail')?.scrollIntoView({behavior:'smooth', block:'nearest'}), 300);
+}
+/* try a model live on the camera (Train) */
+function openTry(k){
+  if (!labSets().length){ toast('Record at least 5 pictures for a gesture in Collect first', 'warn'); return; }
+  Lab.trying = true; Brain.probe = k; Brain.ensure(k);
+  $('#tryPanel').hidden = false; renderModelUI();
+  if (!Cam.stream) Cam.power(true);
+  setTimeout(() => $('#tryPanel').scrollIntoView({behavior:'smooth', block:'center'}), 60);
+}
+function closeTry(){ Lab.trying = false; $('#tryPanel').hidden = true; }
+
+/* =====================================================================
+   ENGINE  ·  camera → hand → KNN → steady filter → robot
+   ===================================================================== */
+const Engine = {
+  lm:null, face:null, box:null, res:null, cur:null, cand:{id:null, n:0}, unk:0, fps:0, frames:0, fpsT:0, busy:false,
+  reset(){ this.lm = null; this.face = null; this.box = null; this.res = null; this.cur = null; this.cand = {id:null, n:0}; this.unk = 0; },
+  async loop(){
+    while (true){
+      const t0 = performance.now();
+      if (S.view === 'app' && (S.mode !== 'train' || Lab.trying) && AI.ready && Cam.stream) { try { await this.step(); } catch (e) { console.warn(e); } }
+      else if (this.cur || this.lm){ this.reset(); renderNow(); }
+      await sleep(Math.max(8, 66 - (performance.now() - t0)));    // ~15 frames per second
+    }
+  },
+  async step(){
+    const f = grab(); if (!f) return;
+    const W = f.width, H = f.height, rec = !!Rec.id;
+    // 1) hand
+    const lm = AI.detect(f), hf = lm ? handFeat(lm, W, H) : null, box = cropBox(lm, W, H);
+    this.lm = lm; this.box = box;
+    await sleep(0);                                            // let taps / clicks through between models (no lag)
+    // 2) face expression: only when a face gesture exists or while recording
+    const needF = rec || Model.has('face'); let face = null;
+    if (needF){ AI.ensureFace(); face = AI.detectFace(f); if (face) await sleep(0); }
+    this.face = face;
+    const ff = face ? faceFeat(face) : null;
+    // 3) object picture: only when an object gesture exists or while recording
+    const needE = rec || Model.has('image');
+    const emb = needE ? AI.embedBox(f, box) : null;
+    if (rec) Rec.take(f, hf, ff, emb, lm ? ptsBox(lm, W, H, 1.6) : face ? ptsBox(face.lm, W, H, 1.3) : box);
+    // classify every kind that is trained, then combine. Anything else = unknown = STOP.
+    const rs = [];
+    if (hf && Model.has('hand')) rs.push(Brain.classify('hand', 'h', 'hand sign', handX(hf)));
+    if (ff && Model.has('face')) rs.push(Brain.classify('face', 'f', 'expression', ff));
+    if (emb && Model.has('image')) rs.push(Brain.classify('image', 'e', 'object', emb));
+    let r = Model.decide(rs);
+    if (!r.why && !r.c) r.why = !Model.trained().length ? 'No gestures trained yet' : lm ? 'Not a trained gesture' : face ? 'Not a trained expression' : 'Nothing trained in view';
+    if (!r.c && !lm && Model.has('hand')) r.why = 'No hand found · show your palm and wrist, a bit farther away';
+    this.res = r; const prev = this.cur;
+    // steady filter: a gesture must be seen N frames in a row; unknown stops within 2 frames
+    if (r.c){
+      this.unk = 0;
+      this.cand = this.cand.id === r.c.id ? {id:r.c.id, n:this.cand.n + 1} : {id:r.c.id, n:1};
+      if (this.cand.n >= S.steady) this.cur = r.c;
+    } else { this.cand = {id:null, n:0}; if (++this.unk >= 2) this.cur = null; }
+    this.frames++; const now = performance.now(); if (now - this.fpsT > 1000){ this.fps = Math.round(this.frames*1000/(now - this.fpsT)); this.frames = 0; this.fpsT = now; }
+    if (prev !== this.cur) Robot.gesture();                 // tell the robot straight away
+    renderNow();
+  }
+};
+
+/* ---------- recording (hold the button) ---------- */
+const Rec = {
+  id:null, btn:null, n:0, lastT:0,
+  start(id, btn){
+    if (!Cam.stream){ toast('Turn on the camera first', 'warn'); return; }
+    if (!AI.ready){ toast('The AI is still loading. One moment…', 'warn'); AI.init(); return; }
+    const c = Model.byId(id); if (!c) return;
+    if (c.samples.length >= MAX_SAMPLES){ toast(`${c.name} already has ${MAX_SAMPLES} pictures`, 'warn'); return; }
+    this.id = id; this.btn = btn; this.n = 0; this.noHand = 0; btn.classList.add('on'); btn.querySelector('span').textContent = 'Recording… keep moving it';
+  },
+  take(f, hf, ff, emb, box){
+    const c = Model.byId(this.id); if (!c || !emb) return;
+    const now = performance.now(); if (now - this.lastT < 90) return; this.lastT = now;
+    c.samples.push({e:emb, h:hf, f:ff}); this.n++; if (!hf) this.noHand++;
+    if (c.thumbs.length < 8 && (c.samples.length % 6 === 1)) c.thumbs.push(thumbOf(f, box));
+    const card = this.btn?.closest('.gest'); if (card){ card.querySelector('[data-count]').textContent = c.samples.length; card.querySelector('.g-bar i').style.width = Math.min(100, c.samples.length/1.5) + '%'; }
+    if (c.samples.length >= MAX_SAMPLES) this.stop();
+  },
+  stop(){
+    if (!this.id) return;
+    const c = Model.byId(this.id), n = this.n, nh = this.noHand; this.id = null;
+    this.btn?.classList.remove('on'); this.btn = null;
+    Model.changed(); renderTrain(); renderLegend();
+    if (c && n){
+      logEvent(`Recorded ${n} pictures for ${c.name}`);
+      const m = Model.mode(c);
+      toast(c.bg ? `No gesture: +${n} pictures (${c.samples.length} total)` : `${c.name}: +${n} pictures · learned as ${m === 'hand' ? 'a hand sign' : m === 'face' ? 'a face expression' : 'an object / picture'}${c.by === 'auto' ? ' (change on the card if wrong)' : ''}`, 'ok');
+    }
+  }
+};
+function thumbOf(src, b){ const c = document.createElement('canvas'); c.width = c.height = 88; c.getContext('2d').drawImage(src, b.x, b.y, b.s, b.s, 0, 0, 88, 88); return c.toDataURL('image/jpeg', .62); }
+
+/* ---------- upload pictures for a gesture ---------- */
+const Upload = {
+  target:null,
+  open(id){ this.target = id; $('#upFile').value = ''; $('#upFile').click(); },
+  async files(list){
+    const c = Model.byId(this.target); if (!c || !list.length) return;
+    if (!AI.ready){ toast('Loading the AI first…'); await AI.init(); if (!AI.ready) return; }
+    let added = 0, hands = 0; toast(`Learning ${list.length} picture${list.length > 1 ? 's' : ''}…`);
+    for (const file of list){
+      if (c.samples.length >= MAX_SAMPLES) break;
+      try {
+        const cv = await fileToCanvas(file);
+        for (const v of [cv, variation(cv), variation(cv)]){        // the photo + 2 slightly changed copies
+          if (c.samples.length >= MAX_SAMPLES) break;
+          const lm = await AI.detectImage(v), box = cropBox(lm, v.width, v.height), face = lm ? null : await AI.detectFaceImage(v);
+          c.samples.push({e:AI.embedBox(v, box), h:lm ? handFeat(lm, v.width, v.height) : null, f:face ? faceFeat(face) : null}); added++; if (lm) hands++;
+          if (v === cv && c.thumbs.length < 8) c.thumbs.push(thumbOf(v, box));
+        }
+      } catch (e) { console.warn(e); }
+      await sleep(0);
+    }
+    Model.changed(); renderTrain(); renderLegend();
+    toast(added ? `${c.name}: +${added} samples (${hands} with a hand found)` : 'No pictures could be read', added ? 'ok' : 'bad');
+  }
+};
+async function fileToCanvas(file){
+  const url = URL.createObjectURL(file);
+  try {
+    const im = new Image(); im.src = url; await im.decode();
+    const k = Math.min(1, 640/Math.max(im.width, im.height)), c = document.createElement('canvas');
+    c.width = Math.round(im.width*k); c.height = Math.round(im.height*k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); return c;
+  } finally { URL.revokeObjectURL(url); }
+}
+function variation(src){
+  const R = (a, b) => a + Math.random()*(b - a), c = document.createElement('canvas'); c.width = src.width; c.height = src.height; const x = c.getContext('2d');
+  if ('filter' in x) x.filter = `brightness(${R(.8, 1.2)}) contrast(${R(.88, 1.15)})`;
+  x.fillStyle = '#808080'; x.fillRect(0, 0, c.width, c.height);
+  const z = R(.9, 1.12); x.translate(c.width/2 + R(-.05, .05)*c.width, c.height/2 + R(-.05, .05)*c.height); x.rotate(R(-.08, .08)); x.scale(z, z);
+  x.drawImage(src, -c.width/2, -c.height/2); return c;
+}
+
+/* =====================================================================
+   BLUETOOTH  ·  Nordic UART to the ESP32 (both directions)
+   ===================================================================== */
+const BLE = {
+  dev:null, rx:null, connected:false, connecting:false, busy:false, uploading:false, latest:null, q:[], lastLatest:false, inbuf:'',
+  async pair(){
+    if (!navigator.bluetooth){ toast('Bluetooth needs Chrome or Edge (on Android or a laptop). On iPhone use the Bluefy browser.', 'bad'); return; }
+    try {
+      const dev = await navigator.bluetooth.requestDevice({filters:[{namePrefix:BLE_NAME_PREFIX}, {services:[SVC]}], optionalServices:[SVC]});
+      await this.connect(dev);
+    } catch (e) { if (e.name !== 'NotFoundError') toast('Robot connection failed: ' + e.message, 'bad'); this.connecting = false; renderBle(); }
+  },
+  async connect(dev){
+    this.dev = dev; this.connecting = true; renderBle();
+    if (!dev._cg){ dev._cg = true; dev.addEventListener('gattserverdisconnected', () => this.onDisc()); }
+    const srv = await dev.gatt.connect(), svc = await srv.getPrimaryService(SVC);
+    this.rx = await svc.getCharacteristic(RXU);
+    const tx = await svc.getCharacteristic(TXU); await tx.startNotifications();
+    if (!tx._cg){ tx._cg = true; tx.addEventListener('characteristicvaluechanged', e => this.onData(new TextDecoder().decode(e.target.value))); }
+    this.connected = true; this.connecting = false; this.busy = false; this.inbuf = '';
+    toast('Robot connected', 'ok'); logEvent('Robot connected over Bluetooth'); renderBle();
+    this.send('H');                                                     // ask the robot what it has
+  },
+  onData(t){
+    this.inbuf += t; let i;
+    while ((i = this.inbuf.indexOf('\n')) >= 0){ const line = this.inbuf.slice(0, i).trim(); this.inbuf = this.inbuf.slice(i + 1); if (line) Robot.onLine(line); }
+    if (this.inbuf.length > 600) this.inbuf = '';
+  },
+  onDisc(){
+    const was = this.connected; this.connected = false; this.rx = null; Robot.lost(); renderBle();
+    if (was && this.dev){ logEvent('Robot disconnected'); toast('Robot disconnected. Reconnecting…', 'warn'); this.reconnect(); }
+  },
+  async reconnect(){ for (let i = 0; i < 6 && !this.connected && this.dev && robotPage(S.mode); i++){ await sleep(1500); try { await this.connect(this.dev); return; } catch { this.connecting = false; renderBle(); } } },
+  disconnect(){ const d = this.dev; this.dev = null; this.connected = false; Robot.lost(); try { d?.gatt?.disconnect(); } catch {} renderBle(); },
+  /* "latest" messages (gesture heartbeat, wheel jog) replace each other, other messages queue */
+  setLatest(s){ this.latest = s.endsWith('\n') ? s : s + '\n'; this.pump(); },
+  send(s){ this.q.push(s.endsWith('\n') ? s : s + '\n'); if (this.q.length > 30) this.q.splice(0, this.q.length - 30); this.pump(); },
+  async write(b, resp){ for (let i = 0; i < b.length; i += 20){ const ch = b.slice(i, i + 20); if (resp && this.rx.writeValueWithResponse) await this.rx.writeValueWithResponse(ch); else if (this.rx.writeValueWithoutResponse) await this.rx.writeValueWithoutResponse(ch); else await this.rx.writeValue(ch); } },
+  async pump(){
+    if (this.busy || this.uploading || !this.connected || !this.rx) return;
+    let msg;
+    if (this.latest && (!this.q.length || !this.lastLatest)){ msg = this.latest; this.latest = null; this.lastLatest = true; }
+    else if (this.q.length){ msg = this.q.shift(); this.lastLatest = false; } else return;
+    this.busy = true;
+    try { await this.write(new TextEncoder().encode(msg), false); } catch (e) { console.warn('BLE write', e); }
+    this.busy = false; if (this.latest || this.q.length) this.pump();
+  },
+  /* program upload: reliable writes (with response), progress 0..1 */
+  async upload(text, onProg){
+    this.uploading = true;
+    try {
+      while (this.busy) await sleep(5);
+      const b = new TextEncoder().encode(text);
+      for (let i = 0; i < b.length; i += 20){
+        const ch = b.slice(i, i + 20);
+        if (this.rx.writeValueWithResponse) await this.rx.writeValueWithResponse(ch); else await this.rx.writeValue(ch);
+        onProg?.(Math.min(1, (i + 20)/b.length));
+      }
+    } finally { this.uploading = false; this.pump(); }
+  }
+};
+const robotPage = m => m === 'code' || m === 'live';
+
+/* =====================================================================
+   ROBOT  ·  what the ESP32 tells us + run / stop / upload
+   ===================================================================== */
+const Robot = {
+  info:null, running:false, l:0, r:0, speed:S.defSpeed, gmap:LS.get('gmap', {}), upHash:LS.get('upHash', ''), waiters:[], uploadingNow:false,
+  onLine(t){
+    const f = t.split(',');
+    if (f[0] === 'I'){ this.info = {fw:f[1], has:f[2] === '1', lcd:f[3] === '1', oled:f[4] === '1', n:+f[5] || 0, name:f.slice(6).join(',')}; renderRobot(); }
+    else if (f[0] === 'M'){ this.l = +f[1] || 0; this.r = +f[2] || 0; const sp = +f[3] || 0; if (sp !== this.speed && this.running) flashSpeed(sp); this.speed = sp; this.setRun(f[4] === '1'); renderTele(); }
+    else if (f[0] === 'RUN') this.setRun(f[1] === '1');
+    else if (f[0] === 'ER') toast('Robot: ' + f.slice(1).join(','), 'bad');
+    this.waiters = this.waiters.filter(w => !w(t));
+  },
+  waitFor(pred, ms){
+    return new Promise((res, rej) => {
+      const w = line => { if (!pred(line)) return false; clearTimeout(tm); res(line); return true; };
+      const tm = setTimeout(() => { this.waiters = this.waiters.filter(x => x !== w); rej(new Error('The robot did not answer')); }, ms);
+      this.waiters.push(w);
+    });
+  },
+  lost(){ this.info = null; this.setRun(false); this.l = this.r = 0; renderTele(); renderRobot(); },
+  setRun(on){ if (this.running === on) return; this.running = on; logEvent(on ? 'Program running on the robot' : 'Program stopped'); renderRun(); renderTele(); if (on) this.gesture(); },
+  gnum(c){ return c ? (this.gmap[c.id] || 0) : 0; },
+  gesture(){ if (BLE.connected && this.running) BLE.setLatest('G,' + this.gnum(Engine.cur)); },
+  /* the blocks on screen are what is on the robot? */
+  synced(){ const p = Code.compiled(); return !!p.ok && !!this.info?.has && this.upHash === p.hash && this.info.n === p.n; },
+  async upload(){
+    if (!BLE.connected){ toast('Connect the robot first', 'warn'); return false; }
+    const p = Code.compiled(true);
+    if (!p.ok){ toast(p.error, 'bad'); return false; }
+    if (this.running) this.stop();
+    this.uploadingNow = true; renderRun(); setUpBar(0);
+    try {
+      const ok = this.waitFor(l => l.startsWith('OK,P') || l.startsWith('ER'), 8000 + p.text.length*4);
+      await BLE.upload(p.text, setUpBar);
+      const ans = await ok;
+      if (!ans.startsWith('OK')) throw new Error(ans.slice(3));
+      this.gmap = p.gmap; this.upHash = p.hash; LS.set('gmap', p.gmap); LS.set('upHash', p.hash);
+      BLE.send('H'); await this.waitFor(l => l.startsWith('I,'), 3000).catch(() => {});
+      toast(`Uploaded “${p.name}” to the robot (${p.n} steps)`, 'ok'); logEvent(`Program uploaded: ${p.n} steps`);
+      return true;
+    } catch (e) { toast('Upload failed: ' + e.message, 'bad'); return false; }
+    finally { this.uploadingNow = false; setUpBar(-1); renderRun(); renderRobot(); }
+  },
+  async run(){
+    if (!BLE.connected){ toast('Connect the robot first', 'warn'); return; }
+    if (!Cam.stream) toast('Tip: turn on the camera so the robot can react to your gestures', 'warn');
+    if (!this.synced() && !(await this.upload())) return;
+    Engine.cand = {id:null, n:0}; BLE.send('R');
+  },
+  stop(){ if (BLE.connected){ BLE.latest = null; BLE.send('X'); } this.setRun(false); },
+  toggle(){ this.running ? this.stop() : this.run(); }
+};
+/* gesture heartbeat: 5x a second while a program runs (the robot stops by itself if it goes quiet) */
+setInterval(() => { if (Robot.running) robotPage(S.mode) && S.view === 'app' ? Robot.gesture() : Robot.stop(); }, 200);
+
+/* =====================================================================
+   RENDER
+   ===================================================================== */
+function setView(v){
+  S.view = v;
+  $('#viewHome').hidden = v !== 'home'; $('#viewApp').hidden = v !== 'app';
+  $('#homeNav').hidden = v !== 'home'; $('#appNav').hidden = v !== 'app';
+  if (v === 'home'){ leaveRobot(); if (Cam.stream) Cam.stop(); Rec.stop(); closeTry(); window.scrollTo(0, 0); }
+  else { AI.init(); renderAll(); if (Brain.deployed()) Brain.ensure(Brain.dep.key); }
+}
+/* leaving the Code / Live pages: stop the program and disconnect the robot */
+function leaveRobot(){
+  if (Robot.running) Robot.stop();
+  if (BLE.connected || BLE.dev){ setTimeout(() => { BLE.disconnect(); }, 150); toast('Robot disconnected (you left the Code page)'); }
+}
+function setMode(m){
+  if (m === 'live' && !Brain.deployed()){
+    toast(Brain.dep ? 'Your pictures changed after deploying. Deploy a model again to unlock Live.' : 'Live unlocks when you deploy a model in Train', 'warn');
+    if (S.mode === 'train') return; m = 'train';
+  }
+  if (Rec.id) Rec.stop();
+  const changed = S.mode !== m;
+  if (changed && robotPage(S.mode) && !robotPage(m)) leaveRobot();
+  else if (changed && Robot.running) Robot.stop();              // Code <-> Live: stop the program, keep the connection
+  if (m !== 'train') closeTry();
+  S.mode = m; renderAll();
+  if (changed){ animateIn(); window.scrollTo({top:0, behavior:'smooth'}); }
+  if (m === 'code'){ if (!Brain.probe) Brain.probe = Brain.dep?.key || 'knn'; Brain.ensure(Brain.probe); Code.open(); }
+  if (m === 'live') Brain.ensure(Brain.dep.key);
+}
+/* soft fade-up of the panels when you switch mode */
+function animateIn(){
+  const el = S.mode === 'train' ? $('#trainView') : S.mode === 'live' ? $('#liveSide') : S.mode === 'code' ? $('#testSide') : $('#trainSide');
+  [...el.children].forEach((c, i) => c.style.setProperty('--i', Math.min(i, 8)));
+  el.classList.remove('enter'); void el.offsetWidth; el.classList.add('enter');
+}
+function moveInd(){
+  const b = $('#modeSeg button.on'), i = $('#segInd'); if (!b || !i || !b.offsetWidth) return;
+  i.style.width = b.offsetWidth + 'px'; i.style.transform = `translateX(${b.offsetLeft}px)`;
+}
+function renderAll(){
+  const m = S.mode;
+  $$('#modeSeg button').forEach(b => b.classList.toggle('on', b.dataset.mode === m)); moveInd();
+  $('#appMain').hidden = m === 'train' || m === 'code'; $('#trainView').hidden = m !== 'train'; $('#codeView').hidden = m !== 'code';
+  $('#trainSide').hidden = m !== 'collect'; $('#liveSide').hidden = m !== 'live';
+  $('#bleBtn').hidden = !robotPage(m);
+  updateStage(); renderTrain(); renderLive(); renderLegend(); renderBle(); renderCamTools(); Cam.label(); renderData(); renderSpeed(); renderLab(); renderModelUI(); renderRobot(); renderRun(); renderTele();
+  for (const id of ['trim', 'steady', 'strict', 'defSpeed']){ const el = $('#' + id); el.value = S[id]; setRange(el); }
+  const fr = $('#frac'); fr.value = Math.round(S.testFrac*100); setRange(fr);
+  renderSettingsOut(); renderDef(); lastRender = 0; renderNow();
+}
+function renderDef(){
+  const v = S.defSpeed;
+  $('#defOut').textContent = v + '%'; $('#defBig').textContent = v; $('#defPwm').textContent = `PWM ${Math.round(v*2.55)} / 255`;
+}
+function updateStage(){
+  $('#stageEmpty').hidden = !!Cam.stream;
+  if (!Cam.stream){ $('#badge').hidden = true; $('#fpsPill').hidden = true; }
+  renderCamTools();
+}
+function renderSettingsOut(){
+  $('#trimOut').textContent = (S.trim > 0 ? '+' : '') + S.trim;
+  $('#steadyOut').textContent = S.steady + (S.steady === 1 ? ' frame' : ' frames'); $('#strictOut').textContent = ['Relaxed', 'Normal', 'Strict'][S.strict];
+}
+function renderBle(){
+  const b = $('#bleBtn'); b.classList.toggle('is-on', BLE.connected); b.classList.toggle('is-busy', BLE.connecting);
+  $('#bleDot').dataset.state = BLE.connected ? 'ok' : BLE.connecting ? 'busy' : '';
+  $('#bleTxt').textContent = BLE.connected ? (BLE.dev?.name || 'Robot connected') : BLE.connecting ? 'Connecting…' : 'Connect robot';
+  $('#bleCard').hidden = BLE.connected;
+  $('#rbTag').textContent = BLE.connected ? 'Connected' : BLE.connecting ? 'Connecting…' : 'Not connected'; $('#rbTag').className = 'tag' + (BLE.connected ? ' ok' : '');
+  $('#rbConnect').innerHTML = `<svg class="i"><use href="#i-bt"/></svg><span>${BLE.connected ? 'Disconnect' : BLE.connecting ? 'Connecting…' : 'Connect robot'}</span>`;
+  $('#rbConnect').className = 'btn btn--block ' + (BLE.connected ? '' : 'btn--brand');
+  renderRobot(); renderRun();
+}
+function actIcon(a){ return `<svg class="i"><use href="#${ACTIONS[a].icon}"/></svg>`; }
+function renderTrain(){
+  const list = $('#gList'); if (!list || Rec.id) return;
+  const real = Model.classes.filter(c => !c.bg);
+  $('#gCount').textContent = `${real.length} gesture${real.length === 1 ? '' : 's'}`;
+  $('#toTrainSub').textContent = `${real.length} gesture${real.length === 1 ? '' : 's'} · ${Model.total()} pictures collected`;
+  $('#quick').innerHTML = QUICK.filter(q => !Model.classes.some(c => c.name.toLowerCase() === q[0].toLowerCase())).map(q => `<button data-q="${q[0]}">${actIcon(q[1])}${q[0]}</button>`).join('');
+  const card = c => {
+    const n = c.samples.length, mode = Model.mode(c);
+    const auto = Model.autoMode(c), M = {hand:['i-hand', 'Hand'], face:['i-face', 'Face'], image:['i-box', 'Object']};
+    const mtag = `<div class="g-by"><span>Recognise by</span>${[['auto', 'i-auto', 'Auto' + (n && auto !== 'none' ? ' · ' + M[auto][1] : '')], ['hand', ...M.hand], ['face', ...M.face], ['image', ...M.image]].map(([k, ic, t]) => `<button data-by="${k}" class="${(c.by || 'auto') === k ? 'on' : ''}"><svg class="i"><use href="#${ic}"/></svg>${t}</button>`).join('')}</div>`;
+    const q = n < 20 ? '<span class="tag" style="color:#b45309">Needs more</span>' : n < 60 ? '<span class="tag">Good</span>' : '<span class="tag ok">Great</span>';
+    return `<div class="gest${c.bg ? ' bg' : ''}" data-id="${c.id}" style="--gc:${c.color}">
+      <div class="g-top"><span class="sw"></span><input class="g-name" value="${esc(c.name)}" maxlength="24" ${c.bg ? 'readonly' : ''} aria-label="Gesture name">
+        <span class="tag"><b data-count>${n}</b> pics</span>${c.bg ? '' : `<button class="g-del" data-del title="Delete gesture"><svg class="i"><use href="#i-x"/></svg></button>`}</div>
+      <div class="g-meta">${c.bg ? '<span class="tag">Robot stays still</span><span class="hint">Record your relaxed hand, your normal face, the room: things that are NOT gestures.</span>' : (n ? q : '<span class="tag">No pictures yet</span>')}</div>
+      ${c.bg ? '' : mtag}
+      <div class="g-bar"><i style="width:${Math.min(100, n/1.5)}%"></i></div>
+      ${c.thumbs.length ? `<div class="thumbs">${c.thumbs.slice(0, 8).map(t => `<img src="${t}" alt="">`).join('')}</div>` : ''}
+      ${c.bg ? '' : `<div class="g-kind"><button data-kind="move" class="${c.action !== 'speed' ? 'on' : ''}">${actIcon('forward')}Move gesture</button><button data-kind="speed" class="${c.action === 'speed' ? 'on' : ''}">${actIcon('speed')}Speed gesture</button></div>
+      ${c.action === 'speed'
+        ? `<div class="g-speed"><span>Sets speed to</span><input type="range" data-speed min="10" max="100" step="10" value="${c.speed}"><output>${c.speed}%</output></div><p class="hint" style="margin-top:.35rem">Showing it stops the robot and sets the PWM speed. Moves use this speed until another speed gesture.</p>`
+        : `<div class="g-acts">${ACT_ORDER.map(a => `<button data-act="${a}" class="${c.action === a ? 'on' : ''}" title="${ACTIONS[a].label}">${actIcon(a)}</button>`).join('')}</div><p class="hint" style="margin-top:.4rem">${ACTIONS[c.action].label} · runs at the speed set by your speed gestures</p>`}`}
+      <div class="g-foot"><button class="rec" data-rec><i></i><span>Hold to record</span></button><button class="up-btn" data-up title="Upload pictures"><svg class="i"><use href="#i-img"/></svg></button></div>
+    </div>`;
+  };
+  list.innerHTML = Model.classes.filter(c => !c.bg).map(card).join('') + card(Model.bg()) + (real.length ? '' : `<div class="empty"><b>No gestures yet</b>Tap a quick-add chip above (Forward, Left…) or type a name.</div>`);
+  list.querySelectorAll('input[data-speed]').forEach(setRange);
+}
+function renderData(ok=true){
+  if (!$('#dsG')){ $('#clearBtn').title = `Clear all training data on this device (${Model.classes.length - 1} gestures, ${Model.total()} pictures)`; return; }
+  const g = Model.classes.filter(c => !c.bg).length, kb = Model.bytes/1024;
+  $('#dsG').textContent = g; $('#dsP').textContent = Model.total();
+  $('#dsK').textContent = kb >= 1024 ? (kb/1024).toFixed(1) + ' MB' : Math.round(kb) + ' KB';
+  const t = $('#saveTag'); t.textContent = ok ? 'Saved' : 'Not saved'; t.className = 'tag ' + (ok ? 'ok' : '');
+  $('#dsT').textContent = Model.savedAt ? `Last saved ${new Date(Model.savedAt).toLocaleString([], {dateStyle:'medium', timeStyle:'short'})} · about ${Math.round(kb/50)}% of the browser's space` : 'Nothing saved yet';
+}
+function renderLegend(){
+  const el = $('#legend'); if (!el) return;
+  const cs = Model.classes.filter(c => !c.bg);
+  el.innerHTML = cs.length ? cs.map(c => `<div class="lg" data-id="${c.id}" style="--gc:${c.color}"><span class="sw" style="background:${c.color}"></span><b>${esc(c.name)}</b><span class="a">${actIcon(c.action)}${c.action === 'speed' ? 'Speed ' + c.speed + '%' : ACTIONS[c.action].label}</span></div>`).join('')
+    + `<div class="lg"><span class="sw" style="background:#94A3B8"></span><b>Anything else</b><span class="a">${actIcon('stop')}Stop</span></div>`
+    : '<div class="empty"><b>No gestures yet</b>Go to Train to add some.</div>';
+  // label the direction pad with the gesture names
+}
+let lastRender = 0;
+function predsHTML(r, emptyMsg){
+  if (!Cam.stream) return '<div class="hint">Turn on the camera to see live predictions.</div>';
+  if (!AI.ready) return '<div class="hint">The AI is loading…</div>';
+  if (!Model.trained().length) return '<div class="hint">Record at least 5 pictures for a gesture to see predictions.</div>';
+  const top = (r?.list || []).slice(0, 4);
+  return `<div class="pv-head"><b>${r?.c ? esc(r.c.name) : 'Nothing seen'}</b><span class="tag ${r?.c ? 'ok' : ''}">${r?.c ? Math.round(r.conf*100) + '% sure' : esc(r?.why || '')}</span></div>`
+    + (top.length ? top.map(x => `<div class="pr"><span>${esc(x.c.name)}</span><span class="t"><i style="width:${Math.round(x.p*100)}%;background:${x.c.color}"></i></span><span>${Math.round(x.p*100)}%</span></div>`).join('') : `<div class="hint">${emptyMsg || 'No hand or trained object in view.'}</div>`);
+}
+function renderNow(){
+  const now = performance.now(); if (now - lastRender < 60) return; lastRender = now;
+  const r = Engine.res, cur = Engine.cur, live = S.mode === 'live', run = Robot.running;
+  // camera badge
+  const bd = $('#badge');
+  if (!Cam.stream){ bd.hidden = true; } else {
+    bd.hidden = false;
+    bd.className = 'badge ' + (cur ? 'go' : 'stop'); bd.style.setProperty('--gc', cur?.color || '');
+    $('#badgeIc').innerHTML = actIcon(cur ? cur.action : 'stop');
+    if (cur){
+      $('#badgeT').textContent = cur.name;
+      $('#badgeS').textContent = `${Math.round((r?.c === cur ? r.conf : .6)*100)}% sure` + (live ? (run ? ' · sent to the robot' : ' · press Run program') : '');
+    } else {
+      $('#badgeT').textContent = !AI.ready ? 'AI loading…' : r?.c && Engine.cand.n ? `Checking ${r.c.name}…` : 'Nothing seen';
+      $('#badgeS').textContent = !AI.ready ? 'One moment' : (r?.why || 'Show a trained gesture');
+    }
+  }
+  // mode pill
+  const mp = $('#modePill');
+  mp.className = 'pill ' + (live ? (run ? 'ok' : '') : 'brand');
+  mp.innerHTML = live ? `<i class="dot" ${run ? 'style="background:#fff"' : ''}></i>${run ? 'Program running' : 'Live · program stopped'}` : `<i class="dot" style="background:#fff"></i>Collecting data`;
+  $('#fpsPill').hidden = !Cam.stream || !AI.ready; $('#fpsPill').textContent = Engine.fps + ' fps';
+  if (S.mode === 'collect'){
+    $('#preds').innerHTML = predsHTML(r);
+    $$('#gList .gest').forEach(g => g.classList.toggle('now', !!cur && g.dataset.id === cur.id));
+  } else if (live) renderLive();
+  else if (S.mode === 'train' && Lab.trying) $('#tryPreds').innerHTML = predsHTML(r);
+}
+function renderLive(){
+  const cur = Engine.cur, r = Engine.res;
+  $('#lnSw').style.background = cur ? cur.color : '#CBD5E1';
+  $('#lnName').textContent = cur ? cur.name : 'Nothing seen';
+  $('#lnWhy').textContent = cur ? (Robot.running ? `Robot gets gesture #${Robot.gnum(cur) || '?'}` : 'Press Run program to send it') : (r?.why || (Cam.stream ? 'Show a trained gesture' : 'Camera is off'));
+  const pct = cur ? Math.round((r?.c === cur ? r.conf : .6)*100) : 0;
+  $('#lnPct').textContent = pct;
+  const cf = $('#lnConf'); cf.style.width = pct + '%'; cf.style.background = cur ? cur.color : 'var(--err)';
+  $$('#legend .lg[data-id]').forEach(l => l.classList.toggle('now', !!cur && l.dataset.id === cur.id));
+}
+/* speed shown on the stage pill + speedometer: the robot's real speed when connected */
+function renderSpeed(){
+  const v = BLE.connected ? Robot.speed : S.defSpeed;
+  $('#spdPill span').textContent = `Speed ${v}%`;
+  Gauge.s = v; $('#gSetTxt').textContent = v + '%';
+  $('#gBy').textContent = BLE.connected ? 'robot speed' : 'default speed';
+}
+/* ---------- speedometer ---------- */
+const Gauge = {
+  x:0, v:0, target:0, s:S.defSpeed, sx:S.defSpeed, shown:-1, built:false,
+  pt(v, r){ const a = (150 + 240*v)*Math.PI/180; return [150 + r*Math.cos(a), 150 + r*Math.sin(a)]; },
+  build(){
+    const f = n => n.toFixed(1), arc = r => { const [x0, y0] = this.pt(0, r), [x1, y1] = this.pt(1, r); return `M${f(x0)} ${f(y0)}A${r} ${r} 0 1 1 ${f(x1)} ${f(y1)}`; };
+    $('#gTrack').setAttribute('d', arc(112)); $('#gArc').setAttribute('d', arc(112));
+    let t = '';
+    for (let i = 0; i <= 50; i++){
+      const v = i/50, mj = i % 5 === 0, [a, b] = this.pt(v, 97), [c, d] = this.pt(v, mj ? 86 : 91);
+      t += `<line class="tk${mj ? ' mj' : ''}" x1="${f(a)}" y1="${f(b)}" x2="${f(c)}" y2="${f(d)}"/>`;
+      if (mj){ const [lx, ly] = this.pt(v, 73); t += `<text x="${f(lx)}" y="${f(ly)}">${i*2}</text>`; }
+    }
+    $('#gTicks').innerHTML = t; this.built = true; this.draw(true);
+  },
+  /* spring physics: the needle swings to the new speed and settles */
+  tick(){
+    if (!this.built) return;
+    const dx = this.target - this.x, ds = this.s - this.sx;
+    if (Math.abs(dx) < .03 && Math.abs(this.v) < .02 && Math.abs(ds) < .03) return;
+    this.v = this.v*.74 + dx*.11; this.x += this.v; this.sx += ds*.14;
+    this.draw();
+  },
+  draw(){
+    const x = clamp(this.x, 0, 100), n = Math.round(x);
+    $('#gNeedle').setAttribute('transform', `rotate(${(150 + 240*clamp(this.x, -2, 102)/100).toFixed(2)} 150 150)`);
+    $('#gArc').style.strokeDashoffset = (100 - x).toFixed(2);
+    $('#gArc').style.opacity = x < .5 ? 0 : 1;
+    $('#gSet').setAttribute('transform', `rotate(${(240*this.sx/100 - 210).toFixed(2)} 150 150)`);
+    if (n !== this.shown){ this.shown = n; $('#gVal').textContent = n; $('#gPwm').textContent = `% SPEED · PWM ${Math.round(n*2.55)}`; }
+    $('#gaugeBox').classList.toggle('moving', this.target > 0);
+  }
+};
+let flashT = 0;
+function flashSpeed(v){
+  $('#sfVal').textContent = v + '%'; $('#spdFlash').hidden = false; $('#spdCard')?.classList.add('flash');
+  clearTimeout(flashT); flashT = setTimeout(() => { $('#spdFlash').hidden = true; $('#spdCard')?.classList.remove('flash'); }, 1800);
+}
+/* telemetry from the robot → speedometer + wheel bars */
+let lastDir = '';
+function dirOf(l, r){
+  if (!l && !r) return ['stop', 'STOPPED'];
+  if (l > 0 && r > 0) return Math.abs(l - r) < 15 ? ['forward', 'FORWARD'] : l < r ? ['curveL', 'FORWARD LEFT'] : ['curveR', 'FORWARD RIGHT'];
+  if (l < 0 && r < 0) return Math.abs(l - r) < 15 ? ['backward', 'REVERSE'] : ['backward', 'REVERSE TURN'];
+  return l < r ? ['left', 'TURN LEFT'] : ['right', 'TURN RIGHT'];
+}
+function renderTele(){
+  const l = Robot.l, r = Robot.r;
+  $('#wl').textContent = l; $('#wr').textContent = r;
+  for (const [id, v] of [['#wlB', l], ['#wrB', r]]){ const el = $(id), w = Math.abs(v)/2; el.style.width = w + '%'; el.style.left = (v < 0 ? 50 - w : 50) + '%'; el.style.background = v < 0 ? 'var(--err)' : 'var(--ok)'; }
+  Gauge.target = Math.max(Math.abs(l), Math.abs(r));
+  const [key, label] = dirOf(l, r);
+  if (key + label !== lastDir){ lastDir = key + label; const d = $('#gDir'); d.classList.toggle('go', key !== 'stop'); d.innerHTML = `${actIcon(key)}<span>${label}</span>`; }
+  renderSpeed();
+}
+
+/* ---------- model pickers, deployed model, nav lock ---------- */
+function renderModelUI(){
+  renderBrain(); renderNav(); renderPills('#tryPills'); renderPills('#codePills'); renderLabGo(); renderToLive();
+  if (S.mode === 'train' && !Lab.running && $('#algos')?.children.length) ALGO_KEYS.forEach(k => refreshCardButtons(k));
+  const pb = $('#predBrain'); if (pb) pb.textContent = ALGOS[Brain.key()].short;
+  const tl = $('#tryLbl'); if (tl) tl.textContent = ALGOS[Brain.key()].name;
+  if (Lab.trying) $('#tryPreds').innerHTML = predsHTML(Engine.res);
+}
+function renderPills(sel){
+  const el = $(sel); if (!el) return;
+  const cur = Brain.key();
+  el.innerHTML = ALGO_KEYS.map(k => { const A = ALGOS[k], r = Lab.res[k], dep = Brain.deployed() && Brain.dep.key === k;
+    return `<button data-pick="${k}" class="${k === cur ? 'on' : ''}" style="--ac:${A.color}" title="${A.name}"><svg class="i"><use href="#${A.icon}"/></svg><span><b>${A.short}</b><small>${Brain.busy(k) ? 'learning…' : r?.state === 'done' ? fmtPct(r.acc) : dep ? 'deployed' : 'ready'}</small></span>${dep ? '<i class="dep" title="Deployed"></i>' : ''}</button>`; }).join('');
+}
+function renderNav(){
+  const b = $('#modeSeg [data-mode="live"]'), locked = !Brain.deployed();
+  b.classList.toggle('locked', locked); b.title = locked ? '4 · Live: deploy a model in Train to unlock' : '4 · Drive the robot';
+}
+function renderBrain(){
+  const el = $('#brainCard'); if (!el) return;
+  const ok = Brain.deployed(), key = Brain.dep?.key || 'knn', A = ALGOS[key], busy = Brain.busy(key);
+  el.className = 'brain' + (ok ? '' : ' warn'); el.style.setProperty('--ac', A.color);
+  el.innerHTML = `<span class="bi"><svg class="i"><use href="#${A.icon}"/></svg></span><p><small>DEPLOYED AI MODEL</small><b>${busy ? 'Preparing ' + A.name + '…' : A.name}</b>${ok ? (Brain.dep.acc != null ? `${fmtPct(Brain.dep.acc)} accurate on hidden test pictures` : 'Deployed') : 'Your data changed. Deploy again in Train.'}</p>`
+    + (ok ? '' : '<button class="btn btn--sm" data-gotrain>Train</button>');
+}
+/* ---------- TRAIN view ---------- */
+function renderLab(){
+  if (!$('#algos')) return;
+  renderLabData();
+  $('#algos').innerHTML = ALGO_KEYS.map(k => algoCard(k)).join('');
+  ALGO_KEYS.forEach(renderAlgoProgress);
+  renderDetail(); renderLabGo(); renderRunBtn();
+}
+function renderRunBtn(){
+  const b = $('#runAll');
+  b.disabled = Lab.running || !labSets().length;
+  b.innerHTML = Lab.running ? `<i class="spin"></i><span>Training ${Lab.step} of 4…</span>` : `<svg class="i"><use href="#i-brain"/></svg><span>${Object.keys(Lab.res).length ? 'Train &amp; test again' : 'Train &amp; test all 4'}</span>`;
+}
+function renderLabData(){
+  const real = Model.classes.filter(c => !c.bg), bg = Model.bg(), M = {hand:'i-hand', face:'i-face', image:'i-box', none:'i-x'};
+  $('#labCls').innerHTML = real.length
+    ? [...real, bg].map(c => { const n = c.samples.length, skip = !c.bg && n < 5; return `<span class="cl${skip ? ' skip' : ''}" title="${skip ? 'Needs at least 5 pictures to be trained' : esc(c.name)}"><i class="sw" style="background:${c.color}"></i>${esc(c.name)}<svg class="i"><use href="#${c.bg ? 'i-stop' : M[Model.mode(c)]}"/></svg><em>${n}</em></span>`; }).join('')
+    : '<span class="hint">No gestures yet. Add and record some in Collect.</span>';
+  $('#labTot').textContent = `${Model.total()} pictures`;
+  let n = 0, te = 0;
+  for (const ds of labSets()) for (let ci = 0; ci < ds.C; ci++){ let c = 0; for (const v of ds.y) if (v === ci) c++; n += c; te += c >= 2 ? clamp(Math.round(c*S.testFrac), 1, c - 1) : 0; }
+  $('#spTr').textContent = n - te; $('#spTe').textContent = te;
+  const bar = $('#spBar').children, f = n ? te/n : S.testFrac;
+  bar[0].style.width = `calc(${(1 - f)*100}% - 2px)`; bar[1].style.width = `calc(${f*100}% - 1px)`;
+  $('#fracOut').textContent = Math.round(S.testFrac*100) + '% for testing';
+  const w = $('#labWarn'), msg = !real.length ? 'Add gestures and record pictures in Collect first.' : !n ? 'Each gesture needs at least 5 pictures before it can be trained.' : (Lab.sig && !Lab.running && Lab.sig !== Model.sig()) ? 'Your data changed after the last test. Run it again for fresh scores.' : '';
+  w.hidden = !msg; w.querySelector('span').textContent = msg;
+}
+function algoCard(key, fresh){
+  const A = ALGOS[key], r = Lab.res[key], st = r ? r.state : 'idle', best = labBest() === key, inuse = Brain.deployed() && Brain.dep.key === key, done = st === 'done';
+  const off = done && !fresh ? 100 - r.acc*100 : st === 'train' ? 72 : 100;
+  return `<div class="algo${st === 'train' ? ' run' : ''}${done ? ' done' : ''}${best ? ' best' : ''}${Lab.focus === key ? ' focus' : ''}${inuse ? ' inuse' : ''}" data-k="${key}" style="--ac:${A.color}">
+    ${best ? '<span class="al-badge"><svg class="i"><use href="#i-trophy"/></svg>BEST</span>' : ''}
+    <div class="al-top"><span class="al-ic"><svg class="i"><use href="#${A.icon}"/></svg></span><div><b>${A.name}</b><small>${A.tech}</small></div></div>
+    <p class="al-desc">${A.desc}</p>
+    <div class="al-ring"><svg viewBox="0 0 120 120"><circle class="trk" cx="60" cy="60" r="52" fill="none" stroke-width="10"/><circle class="val" cx="60" cy="60" r="52" fill="none" stroke-width="10" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="${off}"/></svg>
+      <div><span><b data-acc>${done ? (fresh ? '0%' : fmtPct(r.acc)) : st === 'train' ? '<span data-pp>0%</span>' : '—'}</b><small>${done ? 'ACCURACY' : st === 'train' ? 'LEARNING' : 'NOT TESTED'}</small></span></div></div>
+    <div class="al-prog"><i></i></div>
+    ${key === 'nn' && (st !== 'idle') ? '<svg class="al-spark" viewBox="0 0 100 30" preserveAspectRatio="none"><path/></svg><div class="al-sparkl"><span>LEARNING CURVE</span><span>mistakes ↓</span></div>' : ''}
+    <div class="al-stats"><div>TRAIN TIME<b>${done ? fmtMs(r.trainMs) : '—'}</b></div><div>PER PICTURE<b>${done ? fmtMs(r.predMs) : '—'}</b></div></div>
+    <div class="al-acts">${cardButtons(key)}</div>
+  </div>`;
+}
+function cardButtons(key){
+  const inuse = Brain.deployed() && Brain.dep.key === key, can = !Lab.running && labSets().length > 0, busy = Brain.busy(key);
+  return `<button class="btn al-try" data-try ${can ? '' : 'disabled'} title="Try this model on the camera"><svg class="i"><use href="#i-cam"/></svg><span>Try</span></button>`
+    + `<button class="btn al-use" data-use ${can && !busy ? '' : 'disabled'}>${busy ? '<i class="spin dark"></i>Learning…' : inuse ? '<svg class="i"><use href="#i-check"/></svg>Deployed' : '<svg class="i"><use href="#i-upload"/></svg>Deploy'}</button>`;
+}
+function refreshCardButtons(key){
+  const el = document.querySelector(`.algo[data-k="${key}"]`); if (!el) return;
+  el.classList.toggle('inuse', Brain.deployed() && Brain.dep.key === key);
+  el.querySelector('.al-acts').innerHTML = cardButtons(key);
+}
+function renderAlgo(key){
+  const el = document.querySelector(`.algo[data-k="${key}"]`); if (!el) return;
+  const r = Lab.res[key], fresh = r?.state === 'done' && !r.shown;
+  el.outerHTML = algoCard(key, fresh); renderAlgoProgress(key);
+  if (fresh){
+    r.shown = true; const n = document.querySelector(`.algo[data-k="${key}"]`);
+    requestAnimationFrame(() => requestAnimationFrame(() => { n.querySelector('.val').style.strokeDashoffset = 100 - r.acc*100; countUp(n.querySelector('[data-acc]'), r.acc, fmtPct, 1000); }));
+  }
+}
+function renderAlgoProgress(key){
+  const el = document.querySelector(`.algo[data-k="${key}"]`), r = Lab.res[key]; if (!el || !r) return;
+  el.querySelector('.al-prog i').style.width = Math.round(r.p*100) + '%';
+  const pp = el.querySelector('[data-pp]'); if (pp) pp.textContent = Math.round(r.p*100) + '%';
+  const sp = el.querySelector('.al-spark path'), L = r.losses;
+  if (sp && L.length > 1){ const mx = Math.max(...L), mn = Math.min(...L); sp.setAttribute('d', L.map((v, i) => `${i ? 'L' : 'M'}${(i/(L.length - 1)*100).toFixed(1)} ${(27 - (v - mn)/((mx - mn) || 1)*24).toFixed(1)}`).join(' ')); }
+}
+function countUp(el, to, fmt, dur=900){
+  const t0 = performance.now(), f = now => { const k = Math.min(1, (now - t0)/dur), e = 1 - Math.pow(1 - k, 3); el.textContent = fmt(to*e); if (k < 1) requestAnimationFrame(f); };
+  requestAnimationFrame(f);
+}
+function renderDetail(){
+  const el = $('#labDetail'), k = Lab.focus, r = Lab.res[k];
+  if (!r || r.state !== 'done'){ el.hidden = true; return; }
+  const A = ALGOS[k], cnt = (a, b) => r.conf.get(a + '|' + b) || 0;
+  const present = new Set([...r.conf.keys()].flatMap(s => s.split('|')));
+  const ids = [...Model.classes.filter(c => !c.bg).map(c => c.id), 'bg'].filter(id => present.has(id));
+  const cls = id => Model.byId(id) || {name:'(deleted)', color:'#CBD5E1'};
+  const rows = ids.map(id => { let tot = 0; for (const j of ids) tot += cnt(id, j); return {id, tot, ok:cnt(id, id)}; }).filter(x => x.tot);
+  el.hidden = false; el.style.setProperty('--ac', A.color);
+  el.innerHTML = `<div><h3><svg class="i"><use href="#${A.icon}"/></svg>${A.name} · per gesture</h3><p class="sub">${r.ok} of ${r.tot} hidden test pictures right. Low bars = record more (or more varied) pictures of that gesture.</p>
+      ${rows.map(x => `<div class="pc"><span><i class="sw" style="background:${cls(x.id).color}"></i>${esc(cls(x.id).name)}</span><span class="t"><i data-w="${x.ok/x.tot*100}" style="background:${cls(x.id).color}"></i></span><span>${Math.round(x.ok/x.tot*100)}%</span></div>`).join('')}</div>
+    <div><h3><svg class="i"><use href="#i-list"/></svg>Confusion matrix</h3><p class="sub">Rows are the real gesture, columns what the model answered. Everything off the diagonal is a mistake.</p>
+      <div class="cm"><table><thead><tr><th></th>${rows.map(x => `<th title="${esc(cls(x.id).name)}"><i style="background:${cls(x.id).color}"></i></th>`).join('')}</tr></thead><tbody>
+      ${rows.map((x, ri) => `<tr><th><span style="display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:.35rem;background:${cls(x.id).color}"></span>${esc(cls(x.id).name)}</th>${rows.map((y, ci) => { const v = cnt(x.id, y.id), f = v/x.tot, diag = x.id === y.id;
+        const bg = !v ? 'var(--surface-2)' : `color-mix(in srgb,${diag ? A.color : 'var(--err)'} ${Math.round(12 + f*78)}%,#fff)`;
+        return `<td style="background:${bg};color:${v && f > .5 ? '#fff' : v ? 'var(--text)' : 'var(--text-3)'};animation-delay:${(ri*rows.length + ci)*18}ms">${v || '·'}</td>`; }).join('')}</tr>`).join('')}
+      </tbody></table></div></div>`;
+  requestAnimationFrame(() => requestAnimationFrame(() => el.querySelectorAll('[data-w]').forEach(i => i.style.width = i.dataset.w + '%')));
+}
+function renderLabGo(){
+  const el = $('#labGo'); if (!el) return;
+  const ok = Brain.deployed(), A = ok && ALGOS[Brain.dep.key];
+  el.classList.toggle('dim', !ok);
+  el.innerHTML = ok
+    ? `<span class="ni"><svg class="i"><use href="#i-code"/></svg></span><span><b>${A.name} is deployed</b><small>${Brain.dep.acc != null ? fmtPct(Brain.dep.acc) + ' accurate on hidden test pictures · ' : ''}now program what the robot does</small></span><span class="go"><span>Code it</span><svg class="i"><use href="#i-next"/></svg></span>`
+    : `<span class="ni"><svg class="i"><use href="#i-lock"/></svg></span><span><b>Deploy a model to unlock Live</b><small>Test the 4 models, tap Try to watch each one on the camera, then Deploy the best.</small></span><span class="go"><span>Code</span><svg class="i"><use href="#i-next"/></svg></span>`;
+}
+function renderToLive(){
+  const el = $('#toLive'); if (!el) return;
+  const ok = Brain.deployed();
+  el.classList.toggle('dim', !ok);
+  el.innerHTML = `<span class="ni"><svg class="i"><use href="#${ok ? 'i-play' : 'i-lock'}"/></svg></span><span><b>${ok ? 'Next: Live' : 'Live is locked'}</b><small>${ok ? 'Race the maze with ' + ALGOS[Brain.dep.key].name : 'Deploy a model in Train first'}</small></span><span class="go"><span>${ok ? 'Go Live' : 'Train'}</span><svg class="i"><use href="#i-next"/></svg></span>`;
+}
+
+/* =====================================================================
+   CODE  ·  Blockly blocks  →  a small program (bytecode) for the ESP32
+   ===================================================================== */
+const BLOCKLY_JS = 'https://unpkg.com/blockly@11.2.1/blockly.min.js';
+const OP = {END:0, MOVE:1, STOP:2, WAIT:3, SPEED:4, JMP:5, PUSHN:6, LOOPN:7, IFG:8, WAITG:9, CALL:10, RET:11, LCD:12, LCDCLR:13, OLED:14, OLEDCLR:15, FACE:16, LED:17, VSET:18, VADD:19, FOLLOW:20, HALT:21, UNTILG:22};
+const DIRS = ['forward', 'backward', 'left', 'right', 'curveL', 'curveR', 'backL', 'backR', 'stop'];
+const ACT_NUM = {forward:0, backward:1, left:2, right:3, curveL:4, curveR:5, backL:6, backR:7, stop:8, speed:9};
+const DIR_OPTS = [['forward ↑', 'forward'], ['backward ↓', 'backward'], ['turn left ↺', 'left'], ['turn right ↻', 'right'], ['forward-left ↖', 'curveL'], ['forward-right ↗', 'curveR'], ['back-left ↙', 'backL'], ['back-right ↘', 'backR']];
+const FACES = [['happy', '0'], ['sad', '1'], ['angry', '2'], ['surprised', '3'], ['sleepy', '4'], ['love', '5']];
+const LIMITS = {ins:700, str:96, th:24, g:24};
+const ascii = t => String(t ?? '').replace(/[^\x20-\x7E]/g, '').replace(/\s+/g, ' ');
+function loadScript(src){ return new Promise((res, rej) => { const el = document.createElement('script'); el.src = src; el.onload = res; el.onerror = () => rej(new Error('Could not load ' + src)); document.head.appendChild(el); }); }
+function hashStr(t){ let h = 2166136261; for (let i = 0; i < t.length; i++){ h ^= t.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36); }
+
+/* ---------- SPIKE-style icons (white line icons shown at the start of every block) ---------- */
+const ICON_PATHS = {
+  play:'<path d="M8 5v14l11-7z" fill="#fff"/>',
+  hand:'<path d="M18 11V6a2 2 0 0 0-4 0v5M14 10V4a2 2 0 0 0-4 0v6M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-6-2.4l-3.6-3.6a2 2 0 0 1 2.8-2.8L7 15"/>',
+  eyeoff:'<path d="M3 3l18 18M10.6 6.1A9.8 9.8 0 0 1 12 6c6.4 0 10 6 10 6a17 17 0 0 1-3.2 3.9M6.6 6.6A17 17 0 0 0 2 12s3.6 6 10 6a9.6 9.6 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
+  up:'<path d="M12 20V4M5 11l7-7 7 7"/>',
+  go:'<path d="M5 12h12M12 5l7 7-7 7"/><path d="M3 5v14"/>',
+  stop:'<rect x="6" y="6" width="12" height="12" rx="2" fill="#fff"/>',
+  gauge:'<path d="M12 14l4-4M3.3 17a9 9 0 1 1 17.4 0"/>',
+  follow:'<path d="M18 11V6a2 2 0 0 0-4 0v5M14 10V4a2 2 0 0 0-4 0v6M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-6-2.4"/><path d="M2 20l3-3"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  repeat:'<path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/>',
+  forever:'<path d="M18.2 8.5a4.5 4.5 0 1 1 0 7c-2-1.6-4.4-5.4-6.2-7a4.5 4.5 0 1 0 0 7c1.8-1.6 4.2-5.4 6.2-7z"/>',
+  branch:'<path d="M6 3v12M18 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM18 9a9 9 0 0 1-9 9"/>',
+  until:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><rect x="9.5" y="9.5" width="5" height="5" rx="1" fill="#fff"/>',
+  hourglass:'<path d="M6 2h12M6 22h12M7 2v4a5 5 0 0 0 10 0V2M7 22v-4a5 5 0 0 1 10 0v4"/>',
+  halt:'<path d="M8 2h8l6 6v8l-6 6H8l-6-6V8z"/><path d="M9 12h6"/>',
+  lcd:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 10h8M6 14h12"/>',
+  erase:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M9 9l6 6M15 9l-6 6"/>',
+  oled:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 10h8M8 14h5"/>',
+  face:'<rect x="3" y="4" width="18" height="16" rx="4"/><path d="M8 10v1M16 10v1M8.5 15a5 5 0 0 0 7 0"/>',
+  bulb:'<path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2z"/>',
+  hash:'<path d="M5 9h14M5 15h14M10 3 8 21M16 3l-2 18"/>',
+  plus:'<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
+  puzzle:'<path d="M4 7h3a2 2 0 1 1 4 0h3v3a2 2 0 1 1 0 4v3h-3a2 2 0 1 0-4 0H4z"/>',
+  code:'<rect x="3" y="4" width="8" height="6" rx="2"/><rect x="7" y="14" width="14" height="6" rx="2"/><path d="M7 10v4M14 7h7"/>'
+};
+const iconURI = (k, color='#fff') => 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">${ICON_PATHS[k]}</svg>`);
+/* put an icon (and a thin divider) at the start of a block, like LEGO SPIKE */
+function withIcon(def, k){
+  const shift = m => m.replace(/%(\d+)/g, (_, n) => '%' + (+n + 1));
+  return {...def, message0:'%1 ' + shift(def.message0), args0:[{type:'field_image', src:iconURI(k), width:26, height:26, alt:''}, ...(def.args0 || [])]};
+}
+const BLOCK_ICONS = {cq_start:'play', cq_when_g:'hand', cq_when_none:'eyeoff', cq_move:'up', cq_go:'go', cq_stop:'stop', cq_speed:'gauge', cq_follow:'follow',
+  cq_wait:'clock', cq_repeat:'repeat', cq_forever:'forever', cq_if:'branch', cq_ifelse:'branch', cq_until:'until', cq_wait_g:'hourglass', cq_halt:'halt',
+  cq_lcd:'lcd', cq_lcd_clear:'erase', cq_show_g:'lcd', cq_oled:'oled', cq_face:'face', cq_oled_clear:'erase', cq_led:'bulb', cq_vset:'hash', cq_vadd:'plus', cq_def:'puzzle', cq_call:'puzzle'};
+const CATS = [['Events', 'ev', 'play'], ['Gestures', 'ge', 'hand'], ['Motion', 'mo', 'up'], ['Control', 'ct', 'repeat'], ['Display', 'di', 'lcd'], ['Light', 'li', 'bulb'], ['My blocks', 'fn', 'puzzle']];
+
+/* the program that appears the first time */
+/* recommended program: the robot follows your gestures, the screens show what it sees */
+const DEFAULT_PROGRAM = {blocks:{languageVersion:0, blocks:[
+  {type:'cq_start', x:30, y:30, next:{block:{type:'cq_lcd', fields:{ROW:'0', TXT:'COGNOQUEST ROBOT'}, next:{block:{type:'cq_lcd', fields:{ROW:'1', TXT:'AI: {m}'}, next:{block:{type:'cq_lcd', fields:{ROW:'2', TXT:'Speed: {s}'}, next:{block:{type:'cq_face', fields:{K:'0'}, next:{block:{type:'cq_follow'}}}}}}}}}}},
+  {type:'cq_when_g', x:30, y:330, fields:{G:'__any'}, next:{block:{type:'cq_show_g', fields:{T:'lcd'}, next:{block:{type:'cq_lcd', fields:{ROW:'2', TXT:'Speed: {s}'}, next:{block:{type:'cq_face', fields:{K:'0'}, next:{block:{type:'cq_led', fields:{ON:'1'}}}}}}}}}},
+  {type:'cq_when_none', x:30, y:560, next:{block:{type:'cq_lcd', fields:{ROW:'3', TXT:'Show a gesture'}, next:{block:{type:'cq_face', fields:{K:'4'}, next:{block:{type:'cq_led', fields:{ON:'0'}}}}}}}}
+]}};
+
+const Code = {
+  ws:null, loading:null, cache:null, saveT:0,
+  name(){ return ascii($('#progName').value).trim().slice(0, 20) || 'My robot'; },
+  open(){
+    renderRobot(); renderRun(); renderCats();
+    if (this.ws){ this.refreshToolbox(); requestAnimationFrame(() => Blockly.svgResize(this.ws)); this.changed(); return; }
+    if (!this.loading) this.loading = this.boot().catch(e => {
+      console.warn(e); this.loading = null;
+      $('#wsMsg').innerHTML = '<svg class="i" style="color:var(--warn)"><use href="#i-warn"/></svg><span>The block editor loads from the internet the first time. Check the connection and open Code again.</span>';
+    });
+    return this.loading;
+  },
+  async boot(){
+    if (!window.Blockly) await loadScript(BLOCKLY_JS);
+    defineBlocks();
+    this.ws = Blockly.inject('blockly', {
+      toolbox:toolbox(), renderer:'zelos', theme:'cogno', trashcan:true, sounds:false, media:'https://unpkg.com/blockly@11.2.1/media/',
+      grid:{spacing:28, length:2, colour:'#DCE3EC', snap:true},
+      zoom:{controls:true, wheel:true, startScale:matchMedia('(max-width:640px)').matches ? .72 : .95, maxScale:1.8, minScale:.4, scaleSpeed:1.15},
+      move:{scrollbars:true, drag:true, wheel:false}
+    });
+    try { Blockly.serialization.workspaces.load(LS.get('blocks', null) || DEFAULT_PROGRAM, this.ws); }
+    catch (e) { console.warn(e); this.ws.clear(); Blockly.serialization.workspaces.load(DEFAULT_PROGRAM, this.ws); }
+    this.ws.addChangeListener(e => { if (e.isUiEvent) return; this.cache = null; clearTimeout(this.saveT); this.saveT = setTimeout(() => this.save(), 250); });
+    new ResizeObserver(() => Blockly.svgResize(this.ws)).observe($('#blockly'));
+    $('#wsMsg').hidden = true;
+    this.changed();
+  },
+  save(){ if (!this.ws) return; LS.set('blocks', Blockly.serialization.workspaces.save(this.ws)); this.changed(); },
+  changed(){ this.cache = null; renderRun(); renderProgCard(); },
+  cat:'ev',
+  pick(k){ this.cat = k; renderCats(); if (this.ws){ this.ws.updateToolbox(toolbox()); this.ws.getFlyout()?.scrollToStart?.(); } },
+  refreshToolbox(){ renderCats(); if (this.ws) this.ws.updateToolbox(toolbox()); },
+  compiled(force){ if (!this.ws) return {ok:false, error:'Open Code to load your blocks'}; if (!this.cache || force) this.cache = compileProgram(this.ws, this.name()); return this.cache; }
+};
+
+/* dropdown of your trained gestures (keeps a deleted one so the block still shows it) */
+function gestureOpts(){
+  const o = Model.classes.filter(c => !c.bg).map(c => [c.name, c.id]);
+  const v = this?.getValue?.(); if (v && v !== '__any' && !o.some(x => x[1] === v)) o.push(['⚠ deleted gesture', v]);
+  o.push(['any gesture', '__any']); return o;
+}
+function funcOpts(){
+  const names = Code.ws ? [...new Set(Code.ws.getBlocksByType('cq_def', false).map(b => b.getFieldValue('NAME')).filter(Boolean))] : [];
+  const v = this?.getValue?.(); if (v && !names.includes(v)) names.push(v);
+  if (!names.length) names.push('my block');
+  return names.map(n => [n, n]);
+}
+function defineBlocks(){
+  if (Blockly.Blocks.cq_start) return;
+  class FieldGesture extends Blockly.FieldDropdown {
+    constructor(v){ super(gestureOpts); if (v) this.setValue(v); }
+    doClassValidation_(v){ return typeof v === 'string' && v ? v : null; }
+    static fromJson(o){ return new FieldGesture(o.value); }
+  }
+  class FieldFunc extends Blockly.FieldDropdown {
+    constructor(v){ super(funcOpts); if (v) this.setValue(v); }
+    doClassValidation_(v){ return typeof v === 'string' && v ? v : null; }
+    static fromJson(o){ return new FieldFunc(o.value); }
+  }
+  Blockly.fieldRegistry.register('field_gesture', FieldGesture);
+  Blockly.fieldRegistry.register('field_func', FieldFunc);
+  const st = (p, t, hat) => ({colourPrimary:p, colourSecondary:p, colourTertiary:t, ...(hat ? {hat:'cap'} : {})});
+  const C = {ev:['#F59E0B', '#B9770A'], ge:['#7C3AED', '#5B21B6'], mo:['#E0457B', '#A92D5A'], ct:['#F5821E', '#B85E10'], di:['#2E8BC0', '#1F6A95'], li:['#0EA5A4', '#0A7978'], fn:['#4F46E5', '#3730A3']};
+  const blockStyles = {}, categoryStyles = {};
+  for (const [k, [p, t]] of Object.entries(C)){ blockStyles[k] = st(p, t); blockStyles[k + '_hat'] = st(p, t, true); categoryStyles[k] = {colour:p}; }
+  Blockly.Theme.defineTheme('cogno', {
+    name:'cogno', base:Blockly.Themes.Classic, blockStyles, categoryStyles, startHats:true,
+    componentStyles:{workspaceBackgroundColour:'#F4F6FA', toolboxBackgroundColour:'#FFFFFF', toolboxForegroundColour:'#24262B', flyoutBackgroundColour:'#E9EEF5', flyoutForegroundColour:'#565C66', flyoutOpacity:1, scrollbarColour:'#C3CCD8', scrollbarOpacity:.85, insertionMarkerColour:'#F5821E', insertionMarkerOpacity:.45, cursorColour:'#F5821E'},
+    fontStyle:{family:"'Space Grotesk', system-ui, sans-serif", weight:'700', size:14}
+  });
+  const S_ = {previousStatement:null, nextStatement:null};
+  const G = {type:'field_gesture', name:'G'}, DIR = {type:'field_dropdown', name:'DIR', options:DIR_OPTS};
+  const num = (name, value, min, max, precision) => ({type:'field_number', name, value, min, max, precision});
+  const txtTip = 'Tip: {g} shows the seen gesture, {s} the speed, {n} the count.';
+  Blockly.defineBlocksWithJsonArray([].concat([
+    // events
+    {type:'cq_start', message0:'when program starts', nextStatement:null, style:'ev_hat', tooltip:'Runs when you press Run.'},
+    {type:'cq_when_g', message0:'when %1 is seen', args0:[G], nextStatement:null, style:'ge_hat', tooltip:'Runs every time the camera starts seeing this gesture.'},
+    {type:'cq_when_none', message0:'when nothing is seen', nextStatement:null, style:'ev_hat', tooltip:'Runs when the camera stops seeing a trained gesture.'},
+    // motion
+    {type:'cq_move', message0:'move %1 for %2 seconds', args0:[DIR, num('SECS', 1, 0, 60, .1)], ...S_, style:'mo', tooltip:'Moves, then stops.'},
+    {type:'cq_go', message0:'start moving %1', args0:[DIR], ...S_, style:'mo', tooltip:'Keeps moving until another motion block.'},
+    {type:'cq_stop', message0:'stop moving', ...S_, style:'mo'},
+    {type:'cq_speed', message0:'set speed to %1 %%', args0:[num('PCT', 50, 0, 100, 5)], ...S_, style:'mo', tooltip:'PWM speed for the next moves (0–100%).'},
+    {type:'cq_follow', message0:'drive by gestures', previousStatement:null, nextStatement:null, style:'mo', tooltip:'Every gesture does the move you picked for it in Collect, until the program stops.'},
+    // control
+    {type:'cq_wait', message0:'wait %1 seconds', args0:[num('SECS', 1, 0, 600, .1)], ...S_, style:'ct'},
+    {type:'cq_repeat', message0:'repeat %1 times', args0:[num('N', 4, 0, 1000, 1)], message1:'%1', args1:[{type:'input_statement', name:'DO'}], ...S_, style:'ct'},
+    {type:'cq_forever', message0:'forever', message1:'%1', args1:[{type:'input_statement', name:'DO'}], previousStatement:null, style:'ct'},
+    {type:'cq_if', message0:'if %1 is seen', args0:[G], message1:'%1', args1:[{type:'input_statement', name:'DO'}], ...S_, style:'ct'},
+    {type:'cq_ifelse', message0:'if %1 is seen', args0:[G], message1:'%1', args1:[{type:'input_statement', name:'DO'}], message2:'else %1', args2:[{type:'input_statement', name:'ELSE'}], ...S_, style:'ct'},
+    {type:'cq_until', message0:'repeat until %1 is seen', args0:[G], message1:'%1', args1:[{type:'input_statement', name:'DO'}], ...S_, style:'ct'},
+    {type:'cq_wait_g', message0:'wait until %1 is seen', args0:[G], ...S_, style:'ct'},
+    {type:'cq_halt', message0:'stop program', previousStatement:null, style:'ct'},
+    // display
+    {type:'cq_lcd', message0:'LCD row %1 show %2', args0:[{type:'field_dropdown', name:'ROW', options:[['1', '0'], ['2', '1'], ['3', '2'], ['4', '3']]}, {type:'field_input', name:'TXT', text:'Hello!'}], ...S_, style:'di', tooltip:'20 characters per row. ' + txtTip},
+    {type:'cq_lcd_clear', message0:'clear LCD', ...S_, style:'di'},
+    {type:'cq_show_g', message0:'show seen gesture on %1', args0:[{type:'field_dropdown', name:'T', options:[['LCD', 'lcd'], ['OLED', 'oled']]}], ...S_, style:'di'},
+    {type:'cq_oled', message0:'OLED line %1 show %2 %3', args0:[{type:'field_dropdown', name:'LINE', options:[['1', '0'], ['2', '1'], ['3', '2'], ['4', '3'], ['5', '4'], ['6', '5'], ['7', '6'], ['8', '7']]}, {type:'field_input', name:'TXT', text:'Hi!'}, {type:'field_dropdown', name:'SIZE', options:[['big', '2'], ['small', '1']]}], ...S_, style:'di', tooltip:'Big text: 4 lines of 10 letters. Small: 8 lines of 21. ' + txtTip},
+    {type:'cq_face', message0:'OLED eyes %1', args0:[{type:'field_dropdown', name:'K', options:FACES}], ...S_, style:'di'},
+    {type:'cq_oled_clear', message0:'clear OLED', ...S_, style:'di'},
+    // light & count
+    {type:'cq_led', message0:'robot light %1', args0:[{type:'field_dropdown', name:'ON', options:[['on', '1'], ['off', '0']]}], ...S_, style:'li', tooltip:'The blue LED on the ESP32.'},
+    {type:'cq_vset', message0:'set count to %1', args0:[num('N', 0, -9999, 9999, 1)], ...S_, style:'li', tooltip:'Show it on a display with {n}.'},
+    {type:'cq_vadd', message0:'change count by %1', args0:[num('N', 1, -9999, 9999, 1)], ...S_, style:'li', tooltip:'Show it on a display with {n}.'},
+    // my blocks (functions)
+    {type:'cq_def', message0:'define %1', args0:[{type:'field_input', name:'NAME', text:'my block'}], nextStatement:null, style:'fn_hat', tooltip:'Make your own block. Use it with “run”.'},
+    {type:'cq_call', message0:'run %1', args0:[{type:'field_func', name:'NAME'}], ...S_, style:'fn'}
+  ]).map(d => withIcon(d, BLOCK_ICONS[d.type] || 'code')));
+}
+function toolbox(){
+  const B = (type, fields) => fields ? {kind:'block', type, fields} : {kind:'block', type};
+  const gs = Model.classes.filter(c => !c.bg);
+  const gBlocks = gs.length
+    ? gs.flatMap(c => [{kind:'label', text:'● ' + c.name}, B('cq_when_g', {G:c.id}), B('cq_if', {G:c.id}), B('cq_wait_g', {G:c.id})])
+    : [{kind:'label', text:'Add and train gestures in Collect first'}];
+  const contents = {ev:[B('cq_start'), B('cq_when_g'), B('cq_when_none')], ge:gBlocks,
+    mo:[B('cq_move'), B('cq_go'), B('cq_stop'), B('cq_speed'), B('cq_follow')],
+    ct:[B('cq_wait'), B('cq_repeat'), B('cq_forever'), B('cq_if'), B('cq_ifelse'), B('cq_until'), B('cq_wait_g'), B('cq_halt')],
+    di:[B('cq_lcd'), B('cq_show_g'), B('cq_lcd_clear'), B('cq_oled'), B('cq_face'), B('cq_oled_clear')],
+    li:[B('cq_led'), B('cq_vset'), B('cq_vadd')], fn:[B('cq_def'), B('cq_call')]};
+  const name = (CATS.find(c => c[1] === Code.cat) || CATS[0])[0];
+  return {kind:'flyoutToolbox', contents:[{kind:'label', text:name}, ...contents[Code.cat]]};
+}
+/* our own SPIKE-style category rail (round icon buttons) */
+function renderCats(){
+  const el = $('#cats'); if (!el) return;
+  el.innerHTML = CATS.map(([name, k, ic]) => `<button data-cat="${k}" class="${Code.cat === k ? 'on' : ''}" style="--cc:var(--cat-${k})"><i style="background-image:url('${iconURI(ic)}')"></i><span>${name}</span></button>`).join('');
+}
+
+/* blocks → bytecode lines for the robot (same format the .ino reads) */
+function compileProgram(ws, name){
+  const code = [], strs = [], sidx = new Map(), th = [], funcs = new Map(), calls = [], gmap = {}, gl = [];
+  Model.classes.filter(c => !c.bg).slice(0, LIMITS.g).forEach((c, i) => { gmap[c.id] = i + 1; gl.push(c); });
+  let loose = 0, missingG = false;
+  const G = v => v === '__any' ? -1 : gmap[v] || (missingG = true, 999);
+  const str = t => { t = ascii(t).slice(0, 40); if (!sidx.has(t)){ sidx.set(t, strs.length); strs.push(t); } return sidx.get(t); };
+  const emit = (op, a = 0, b = 0, c = 0) => (code.push([op, Math.round(a), Math.round(b), Math.round(c)]), code.length - 1);
+  const ms = v => Math.round(clamp(+v || 0, 0, 3600)*1000);
+  const on = b => !b.isEnabled || b.isEnabled();
+  const stack = b => { for (; b; b = b.getNextBlock()) if (on(b)) stmt(b); };
+  const kid = (b, n) => b.getInputTargetBlock(n);
+  function stmt(b){
+    const f = n => b.getFieldValue(n);
+    switch (b.type){
+      case 'cq_move': emit(OP.MOVE, DIRS.indexOf(f('DIR')), Math.max(1, ms(f('SECS'))), -1); break;
+      case 'cq_go': emit(OP.MOVE, DIRS.indexOf(f('DIR')), 0, -1); break;
+      case 'cq_stop': emit(OP.STOP); break;
+      case 'cq_speed': emit(OP.SPEED, clamp(+f('PCT') || 0, 0, 100)); break;
+      case 'cq_follow': emit(OP.FOLLOW); break;
+      case 'cq_wait': emit(OP.WAIT, ms(f('SECS'))); break;
+      case 'cq_repeat': { const i = emit(OP.PUSHN, Math.max(0, Math.round(+f('N') || 0))), L = code.length; stack(kid(b, 'DO')); emit(OP.LOOPN, L); code[i][2] = code.length; break; }
+      case 'cq_forever': { const L = code.length; stack(kid(b, 'DO')); emit(OP.JMP, L); break; }
+      case 'cq_if': { const i = emit(OP.IFG, G(f('G'))); stack(kid(b, 'DO')); code[i][2] = code.length; break; }
+      case 'cq_ifelse': { const i = emit(OP.IFG, G(f('G'))); stack(kid(b, 'DO')); const j = emit(OP.JMP); code[i][2] = code.length; stack(kid(b, 'ELSE')); code[j][1] = code.length; break; }
+      case 'cq_until': { const L = code.length, i = emit(OP.UNTILG, G(f('G'))); stack(kid(b, 'DO')); emit(OP.JMP, L); code[i][2] = code.length; break; }
+      case 'cq_wait_g': emit(OP.WAITG, G(f('G'))); break;
+      case 'cq_halt': emit(OP.HALT); break;
+      case 'cq_lcd': emit(OP.LCD, +f('ROW'), str(f('TXT'))); break;
+      case 'cq_lcd_clear': emit(OP.LCDCLR); break;
+      case 'cq_show_g': f('T') === 'lcd' ? emit(OP.LCD, 3, str('Seen: {g}')) : emit(OP.OLED, 3, str('{g}'), 2); break;
+      case 'cq_oled': emit(OP.OLED, +f('LINE'), str(f('TXT')), +f('SIZE')); break;
+      case 'cq_face': emit(OP.FACE, +f('K')); break;
+      case 'cq_oled_clear': emit(OP.OLEDCLR); break;
+      case 'cq_led': emit(OP.LED, +f('ON')); break;
+      case 'cq_vset': emit(OP.VSET, +f('N') || 0); break;
+      case 'cq_vadd': emit(OP.VADD, +f('N') || 0); break;
+      case 'cq_call': calls.push([emit(OP.CALL), f('NAME')]); break;
+    }
+  }
+  for (const b of ws.getTopBlocks(true)){
+    if (!on(b)) continue;
+    const t = b.type;
+    if (t === 'cq_start' || t === 'cq_when_g' || t === 'cq_when_none'){
+      th.push([t === 'cq_start' ? 0 : t === 'cq_when_g' ? 1 : 2, t === 'cq_when_g' ? G(b.getFieldValue('G')) : 0, code.length]);
+      stack(b.getNextBlock()); emit(OP.END);
+    } else if (t === 'cq_def'){
+      const n = b.getFieldValue('NAME');
+      if (funcs.has(n)) return {ok:false, error:`Two “define ${n}” blocks. Give them different names.`};
+      funcs.set(n, code.length); stack(b.getNextBlock()); emit(OP.RET);
+    } else loose++;
+  }
+  for (const [i, n] of calls){ if (!funcs.has(n)) return {ok:false, error:`“run ${n}” needs a “define ${n}” block`}; code[i][1] = funcs.get(n); }
+  if (!th.length) return {ok:false, error:'Start with a hat block, e.g. “when program starts”'};
+  if (code.length > LIMITS.ins) return {ok:false, error:`Program is too long (${code.length} steps, max ${LIMITS.ins})`};
+  if (strs.length > LIMITS.str) return {ok:false, error:'Too many different texts'};
+  if (th.length > LIMITS.th) return {ok:false, error:`Too many hat blocks (max ${LIMITS.th})`};
+  const lines = [`PB,${code.length},${strs.length},${gl.length},${th.length},${S.defSpeed},${S.trim}`, `PN,${name}`, `PM,${ascii(ALGOS[Brain.dep?.key || Brain.key()].short)}`];
+  gl.forEach((c, i) => lines.push(`PG,${i + 1},${ACT_NUM[c.action] ?? 8},${c.speed || 0},${ascii(c.name).slice(0, 20) || 'G' + (i + 1)}`));
+  strs.forEach((t, i) => lines.push(`PS,${i},${t}`));
+  th.forEach(([ty, a, pc], i) => lines.push(`PT,${i},${ty},${a},${pc}`));
+  code.forEach(([o, a, b, c], i) => lines.push(`PI,${i},${o},${a},${b},${c}`));
+  lines.push(`PE,${lines.length}`);
+  const text = lines.join('\n') + '\n';
+  return {ok:true, text, hash:hashStr(text), n:code.length, gmap, name, loose, missingG, threads:th.length};
+}
+
+/* ---------- Code page status ---------- */
+function renderRobot(){
+  const i = Robot.info, el = $('#rbChips');
+  if (el) el.innerHTML = !BLE.connected
+    ? '<span class="hint">Switch the robot on. Its screens say “Waiting for app”. Then connect.</span>'
+    : !i ? '<span class="hint"><i class="spin dark"></i> Talking to the robot…</span>'
+    : [[i.lcd, 'LCD 20×4'], [i.oled, 'OLED'], [i.has, i.has ? 'Program: ' + esc(i.name || 'saved') : 'No program yet']].map(([ok, t]) => `<span class="rchip ${ok ? 'ok' : ''}"><svg class="i"><use href="#${ok ? 'i-check' : 'i-x'}"/></svg>${t}</span>`).join('') + `<span class="rchip">FW ${esc(i.fw || '?')}</span>`;
+  renderProgCard();
+}
+function renderProgCard(){
+  const el = $('#progCard'); if (!el) return;
+  const i = Robot.info, synced = Robot.synced();
+  let head = 'PROGRAM ON THE ROBOT', title, line, btn = '<button class="btn btn--sm" data-gocode>Edit blocks</button>', warn = false;
+  if (!BLE.connected){ title = 'Not connected'; line = 'Connect the robot to run your program.'; }
+  else if (!i){ title = 'Checking…'; line = 'Asking the robot what it has.'; }
+  else if (!i.has){ title = 'No program yet'; line = 'Build one in Code and upload it.'; warn = true; }
+  else if (Code.ws && !synced){ title = esc(i.name || 'Saved program'); line = 'Your latest blocks are not on it. Run uploads them first.'; warn = true; }
+  else { title = esc(i.name || 'Saved program'); line = `${i.n} steps · ready to run`; }
+  el.className = 'brain prog' + (warn ? ' warn' : ''); el.style.setProperty('--ac', '#4F46E5');
+  el.innerHTML = `<span class="bi"><svg class="i"><use href="#i-code"/></svg></span><p><small>${head}</small><b>${title}</b>${line}</p>${btn}`;
+}
+function renderRun(){
+  const run = Robot.running, up = Robot.uploadingNow, p = Code.ws ? Code.compiled() : null, st = $('#progState');
+  if (st){
+    let t, cls = '';
+    if (!p) t = 'Loading blocks…';
+    else if (!p.ok){ t = p.error; cls = 'bad'; }
+    else if (!BLE.connected) t = `${p.n} steps · connect the robot to upload`;
+    else if (up) t = 'Uploading…';
+    else if (Robot.synced()){ t = run ? 'Running on the robot' : 'On the robot ✓'; cls = 'ok'; }
+    else { t = 'Changes not uploaded yet'; cls = 'warn'; }
+    if (p?.ok && p.loose) t += ` · ${p.loose} loose block${p.loose > 1 ? 's' : ''} ignored`;
+    st.textContent = t; st.title = t; st.className = 'tag ' + cls;
+  }
+  const ub = $('#upBtn'); if (ub) ub.disabled = up || !BLE.connected || !p?.ok;
+  const rb = $('#runBtn');
+  if (rb){ rb.disabled = up || !BLE.connected || (!run && !p?.ok); rb.className = 'btn ' + (run ? 'btn--stop' : 'btn--brand'); rb.innerHTML = run ? '<svg class="i"><use href="#i-stop"/></svg><span>Stop</span>' : '<svg class="i"><use href="#i-play"/></svg><span>Run</span>'; }
+  const wr = $('#wsRun');
+  if (wr){ wr.classList.toggle('on', run); wr.disabled = up || (!run && !p?.ok); wr.innerHTML = up ? '<i class="spin"></i>' : `<svg class="i"><use href="#${run ? 'i-stop' : 'i-play'}"/></svg>`; wr.title = run ? 'Stop the program' : 'Run the program on the robot'; }
+  const ab = $('#armBtn');
+  if (ab){ ab.classList.toggle('on', run); ab.disabled = up; ab.innerHTML = run ? '<svg class="i"><use href="#i-stop"/></svg><span>Stop program</span>' : up ? '<i class="spin"></i><span>Uploading…</span>' : '<svg class="i"><use href="#i-play"/></svg><span>Run program</span>'; }
+  renderProgCard();
+}
+function setUpBar(p){ const b = $('#upBar'); if (!b) return; b.hidden = p < 0; if (p >= 0) b.firstElementChild.style.width = Math.round(p*100) + '%'; }
+
+/* hand skeleton + label on the camera */
+const BONES = [[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[17,18],[18,19],[19,20],[0,17]];
+function contentRect(W, H, vw, vh){ const s = Math.min(W/vw, H/vh), w = vw*s, h = vh*s; return {x:(W - w)/2, y:(H - h)/2, w, h}; }
+function rr(ctx, x, y, w, h, r){ ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function fitCanvas(cv, W, H){
+  const dpr = devicePixelRatio || 1;
+  if (cv.width !== Math.round(W*dpr) || cv.height !== Math.round(H*dpr)){ cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr); }
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); return ctx;
+}
+/* small camera previews (Train → Try, Code → Test): draw the AI's own frame + the marks */
+function paintMini(cv){
+  const box = cv.parentElement, W = box.clientWidth, H = box.clientHeight; if (!W || !H) return;
+  box.querySelector('[data-camon]').hidden = !!Cam.stream;
+  const ctx = fitCanvas(cv, W, H);
+  if (!Cam.stream || !proc.width) return;
+  const rc = contentRect(W, H, proc.width, proc.height);
+  ctx.save(); if (Cam.mirror){ ctx.translate(rc.x*2 + rc.w, 0); ctx.scale(-1, 1); } ctx.drawImage(proc, rc.x, rc.y, rc.w, rc.h); ctx.restore();
+  drawMarks(ctx, rc);
+}
+function frame(){
+  requestAnimationFrame(frame);
+  Gauge.tick();
+  if (S.view !== 'app') return;
+  if (S.mode === 'train' && Lab.trying) paintMini($('#tryCv'));
+  if (S.mode === 'code') paintMini($('#codeCv'));
+  if (S.mode !== 'collect' && S.mode !== 'live') return;
+  const ctx = fitCanvas(overlay, stage.clientWidth, stage.clientHeight), vw = camEl.videoWidth, vh = camEl.videoHeight;
+  if (!Cam.stream || !vw) return;
+  drawMarks(ctx, contentRect(stage.clientWidth, stage.clientHeight, vw, vh));
+}
+function drawMarks(ctx, rc){
+  const lm = Engine.lm, mx = x => rc.x + (Cam.mirror ? 1 - x : x)*rc.w, my = y => rc.y + y*rc.h;
+  const cur = Engine.cur, r = Engine.res, col = cur ? cur.color : (lm || Engine.face ? '#E0484B' : '#94A3B8');
+  if (lm){
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 7; ctx.beginPath();
+    for (const [a, b] of BONES){ ctx.moveTo(mx(lm[a].x), my(lm[a].y)); ctx.lineTo(mx(lm[b].x), my(lm[b].y)); } ctx.stroke();
+    ctx.strokeStyle = col; ctx.lineWidth = 3.5; ctx.beginPath();
+    for (const [a, b] of BONES){ ctx.moveTo(mx(lm[a].x), my(lm[a].y)); ctx.lineTo(mx(lm[b].x), my(lm[b].y)); } ctx.stroke();
+    for (let i = 0; i < 21; i++){ ctx.beginPath(); ctx.arc(mx(lm[i].x), my(lm[i].y), [4, 8, 12, 16, 20].includes(i) ? 5.5 : 4, 0, 7); ctx.fillStyle = '#fff'; ctx.fill(); ctx.lineWidth = 2.2; ctx.strokeStyle = col; ctx.stroke(); }
+    // label above the hand
+    let x0 = 1, y0 = 1; for (const p of lm){ x0 = Math.min(x0, Cam.mirror ? 1 - p.x : p.x); y0 = Math.min(y0, p.y); }
+    const label = cur ? `${cur.name}` : (r?.c && Engine.cand.n ? `${r.c.name}?` : 'Unknown');
+    ctx.font = '600 13px "Space Grotesk",system-ui'; ctx.textBaseline = 'middle';
+    const tw = ctx.measureText(label).width + 18, tx = clamp(rc.x + x0*rc.w, rc.x + 4, rc.x + rc.w - tw - 4), ty = Math.max(rc.y + 6, rc.y + y0*rc.h - 34);
+    ctx.fillStyle = col; rr(ctx, tx, ty, tw, 24, 12); ctx.fill(); ctx.fillStyle = '#fff'; ctx.fillText(label, tx + 9, ty + 12.5);
+  } else if (Engine.face && Model.has('face')){
+    let x0 = 1, y0 = 1, x1 = 0, y1 = 0; for (const p of Engine.face.lm){ const x = Cam.mirror ? 1 - p.x : p.x; x0 = Math.min(x0, x); y0 = Math.min(y0, p.y); x1 = Math.max(x1, x); y1 = Math.max(y1, p.y); }
+    const x = rc.x + x0*rc.w, y = rc.y + y0*rc.h, w = (x1 - x0)*rc.w, h = (y1 - y0)*rc.h;
+    ctx.strokeStyle = col; ctx.lineWidth = 3; rr(ctx, x, y, w, h, 18); ctx.stroke();
+    const label = cur ? cur.name : (r?.c && Engine.cand.n ? `${r.c.name}?` : 'Unknown');
+    ctx.font = '600 13px "Space Grotesk",system-ui'; ctx.textBaseline = 'middle';
+    const tw = ctx.measureText(label).width + 18, tx = clamp(x, rc.x + 4, rc.x + rc.w - tw - 4), ty = Math.max(rc.y + 6, y - 30);
+    ctx.fillStyle = col; rr(ctx, tx, ty, tw, 24, 12); ctx.fill(); ctx.fillStyle = '#fff'; ctx.fillText(label, tx + 9, ty + 12.5);
+  } else if (Engine.box && Model.has('image') && proc.width){
+    // object gestures: show the area the AI checks
+    const b = Engine.box, sx = rc.w/proc.width, sy = rc.h/proc.height;
+    const x = Cam.mirror ? rc.x + rc.w - (b.x + b.s)*sx : rc.x + b.x*sx;
+    ctx.setLineDash([8, 7]); ctx.strokeStyle = cur ? cur.color : 'rgba(65,64,66,.45)'; ctx.lineWidth = 2.5; rr(ctx, x, rc.y + b.y*sy, b.s*sx, b.s*sy, 16); ctx.stroke(); ctx.setLineDash([]);
+  }
+}
+
+/* =====================================================================
+   EVENTS
+   ===================================================================== */
+$('#openApp').onclick = $('#heroStart').onclick = $('#ctaStart').onclick = () => { setView('app'); setMode('collect'); animateIn(); };
+$('#wordHome').onclick = () => setView('home');
+$('#homeBtn').onclick = () => setView('home');
+$$('[data-go]').forEach(a => a.onclick = e => { e.preventDefault(); setView('app'); setMode(a.dataset.go); });
+$$('#modeSeg button').forEach(b => b.onclick = () => setMode(b.dataset.mode));
+$('#bleBtn').onclick = $('#bleCardBtn').onclick = $('#rbConnect').onclick = () => BLE.connected ? confirmBox('Disconnect the robot?', 'The robot will stop and you can reconnect any time.', 'Disconnect').then(ok => ok && BLE.disconnect()) : BLE.pair();
+$('#camOnBtn').onclick = () => Cam.power(true);
+$$('[data-cam]').forEach(b => b.onclick = () => Cam.action(b.dataset.cam));
+$('#zoomSeg').addEventListener('click', e => { const b = e.target.closest('[data-lens]'); if (b) Cam.setLens(+b.dataset.lens); });
+
+// gestures
+function addGesture(name, action, speed){
+  name = (name || '').trim(); if (!name) { $('#newName').focus(); return; }
+  if (Model.classes.some(c => c.name.toLowerCase() === name.toLowerCase())){ toast('That gesture already exists', 'warn'); return; }
+  const guess = action || (/speed|pwm|%/i.test(name) ? 'speed' : /(curve|forw|front).*left/i.test(name) ? 'curveL' : /(curve|forw|front).*right/i.test(name) ? 'curveR' : /back.*left/i.test(name) ? 'backL' : /back.*right/i.test(name) ? 'backR' : /forw|ahead|go|up/i.test(name) ? 'forward' : /rev|back/i.test(name) ? 'backward' : /(curve|forw|front).*left/i.test(name) ? 'curveL' : /(curve|forw|front).*right/i.test(name) ? 'curveR' : /back.*left/i.test(name) ? 'backL' : /back.*right/i.test(name) ? 'backR' : /left/i.test(name) ? 'left' : /right/i.test(name) ? 'right' : /stop|halt|fist/i.test(name) ? 'stop' : 'forward');
+  const pct = +(/(\d{1,3})\s*%?/.exec(name)?.[1] || 0), c = Model.add(name, guess, speed || (guess === 'speed' ? clamp(Math.round((pct || 40)/10)*10, 10, 100) : 0));
+  $('#newName').value = ''; renderTrain(); renderLegend();
+  toast(c.action === 'speed' ? `Added speed gesture “${c.name}” (sets ${c.speed}%). Now hold Record while showing it.` : `Added “${c.name}” (${ACTIONS[c.action].label}). Now hold Record while showing it.`, 'ok');
+}
+$('#addBtn').onclick = () => addGesture($('#newName').value);
+$('#newName').addEventListener('keydown', e => { if (e.key === 'Enter') addGesture($('#newName').value); });
+$('#quick').addEventListener('click', e => { const b = e.target.closest('[data-q]'); if (!b) return; const q = QUICK.find(x => x[0] === b.dataset.q); addGesture(q[0], q[1], q[2]); });
+const gl = $('#gList');
+gl.addEventListener('pointerdown', e => {
+  const b = e.target.closest('[data-rec]'); if (!b) return; e.preventDefault();
+  try { b.setPointerCapture(e.pointerId); } catch {}
+  Rec.start(b.closest('.gest').dataset.id, b);
+});
+['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev => gl.addEventListener(ev, e => { if (Rec.id && e.target.closest?.('[data-rec]')) Rec.stop(); }));
+document.addEventListener('pointerup', () => { if (Rec.id) Rec.stop(); });
+gl.addEventListener('contextmenu', e => { if (e.target.closest('[data-rec]')) e.preventDefault(); });
+gl.addEventListener('click', async e => {
+  const card = e.target.closest('.gest'); if (!card) return; const c = Model.byId(card.dataset.id); if (!c) return;
+  if (e.target.closest('[data-del]')){
+    if (await confirmBox(`Delete “${c.name}”?`, `Its ${c.samples.length} pictures will be removed. This cannot be undone.`, 'Delete')){ Model.remove(c.id); renderTrain(); renderLegend(); toast(`Deleted ${c.name}`); }
+    return;
+  }
+  const a = e.target.closest('[data-act]');
+  if (a){ c.action = a.dataset.act; Model.changed(); renderTrain(); renderLegend(); return; }
+  const by = e.target.closest('[data-by]');
+  if (by){ c.by = by.dataset.by; Model.changed(); renderTrain(); toast(`${c.name} will be recognised by ${c.by === 'auto' ? 'whatever fits its pictures best' : c.by === 'hand' ? 'hand shape' : c.by === 'face' ? 'face expression' : 'object picture'}`); return; }
+  const k = e.target.closest('[data-kind]');
+  if (k){ if (k.dataset.kind === 'speed'){ c.action = 'speed'; if (!c.speed) c.speed = 40; } else if (c.action === 'speed') c.action = 'forward'; Model.changed(); renderTrain(); renderLegend(); return; }
+  if (e.target.closest('[data-up]')) Upload.open(c.id);
+});
+gl.addEventListener('input', e => {
+  const card = e.target.closest('.gest'); if (!card) return; const c = Model.byId(card.dataset.id); if (!c) return;
+  if (e.target.matches('[data-speed]')){ c.speed = +e.target.value; e.target.nextElementSibling.textContent = c.speed + '%'; setRange(e.target); Model.changed(); renderLegend(); }
+  if (e.target.matches('.g-name')){ c.name = e.target.value.trim() || c.name; Model.changed(); renderLegend(); }
+});
+gl.addEventListener('change', e => { if (e.target.matches('.g-name')) renderTrain(); });
+$('#upFile').onchange = e => Upload.files([...e.target.files]);
+
+// data
+$('#exportBtn').onclick = () => {
+  Model.save();
+  const blob = new Blob([JSON.stringify(Model.pack())], {type:'application/json'}), a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = `cogno-gesture-${new Date().toISOString().slice(0, 10)}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  toast('Training exported', 'ok');
+};
+$('#importBtn').onclick = () => { $('#importFile').value = ''; $('#importFile').click(); };
+$('#importFile').onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try { Model.unpack(JSON.parse(await f.text())); Model.save(); renderAll(); toast(`Imported ${Model.classes.length - 1} gestures`, 'ok'); }
+  catch (err) { toast('That file could not be imported: ' + err.message, 'bad'); }
+};
+$('#clearBtn').onclick = async () => {
+  if (Rec.id) Rec.stop();
+  if (await confirmBox('Clear all data on this device?', `All ${Model.classes.length - 1} gestures and ${Model.total()} pictures will be deleted from this browser. Export first if you want to keep a copy. This cannot be undone.`, 'Clear data')){
+    if (Robot.running) Robot.stop();
+    Model.reset(); Engine.reset(); LS.del('data'); LS.del('savedAt'); Model.savedAt = 0; Model.bytes = 0; Model.save();
+    renderAll(); toast('All gesture data cleared from this device', 'ok'); logEvent('Device data cleared');
+  }
+};
+
+// collect → train → live
+$('#toTrain').onclick = () => setMode('train');
+$('#defSpeed').addEventListener('input', e => { S.defSpeed = +e.target.value; setRange(e.target); saveSettings(); renderDef(); renderSpeed(); Code.changed(); });
+$('#frac').addEventListener('input', e => { S.testFrac = +e.target.value/100; setRange(e.target); saveSettings(); renderLabData(); });
+$('#runAll').onclick = () => runLab();
+$('#algos').addEventListener('click', e => {
+  const card = e.target.closest('.algo'); if (!card) return; const k = card.dataset.k;
+  if (e.target.closest('[data-use]')){ Brain.deploy(k); return; }
+  if (e.target.closest('[data-try]')){ openTry(k); return; }
+  if (Lab.res[k]?.state === 'done' && !Lab.running){ Lab.focus = k; $$('#algos .algo').forEach(a => a.classList.toggle('focus', a.dataset.k === k)); renderDetail(); }
+});
+$('#labGo').onclick = () => Brain.deployed() ? setMode('code') : toast('Deploy a model first: tap Deploy on one of the 4 cards', 'warn');
+$('#toLive').onclick = () => setMode('live');
+$('#brainCard').addEventListener('click', e => { if (e.target.closest('[data-gotrain]')) setMode('train'); });
+$('#progCard').addEventListener('click', e => { if (e.target.closest('[data-gocode]')) setMode('code'); });
+// model pickers (Train → Try, Code → Test)
+for (const sel of ['#tryPills', '#codePills']) $(sel).addEventListener('click', e => {
+  const b = e.target.closest('[data-pick]'); if (!b) return;
+  Brain.probe = b.dataset.pick; Brain.ensure(Brain.probe); Engine.cand = {id:null, n:0}; renderModelUI();
+  toast(`Now testing with ${ALGOS[Brain.probe].name}`);
+});
+$('#tryClose').onclick = () => { closeTry(); renderModelUI(); };
+$('#tryAdd').onclick = () => setMode('collect');
+$('#tryDeploy').onclick = () => Brain.deploy(Brain.key());
+$$('[data-camon] button').forEach(b => b.onclick = () => Cam.power(true));
+// code page
+$('#progName').value = LS.get('progName', 'My robot');
+$('#progName').addEventListener('input', e => { LS.set('progName', e.target.value); Code.changed(); });
+$('#upBtn').onclick = () => Robot.upload();
+$('#cats').addEventListener('click', e => { const b = e.target.closest('[data-cat]'); if (b) Code.pick(b.dataset.cat); });
+$('#exBtn').onclick = async () => {
+  if (!Code.ws) return;
+  if (!(await confirmBox('Load the example program?', 'Your blocks will be replaced by the recommended program: the robot follows your gestures and the LCD and OLED show what it sees.', 'Load example'))) return;
+  Code.ws.clear(); Blockly.serialization.workspaces.load(DEFAULT_PROGRAM, Code.ws); Code.save(); toast('Example program loaded', 'ok');
+};
+$('#runBtn').onclick = $('#wsRun').onclick = () => Robot.toggle();
+/* wiring check: hold a button, the wheels turn (keeps sending while held) */
+let jogT = 0;
+const JOG = {forward:[60, 60], backward:[-60, -60], left:[-55, 55], right:[55, -55], stop:[0, 0]};
+function jog(dir){
+  clearInterval(jogT);
+  if (!BLE.connected){ toast('Connect the robot first', 'warn'); return; }
+  if (Robot.running) Robot.stop();
+  const [l, r] = JOG[dir]; BLE.setLatest(`D,${l},${r}`);
+  if (dir !== 'stop') jogT = setInterval(() => BLE.setLatest(`D,${l},${r}`), 300);
+}
+$('#jog').addEventListener('pointerdown', e => { const b = e.target.closest('[data-jog]'); if (!b) return; e.preventDefault(); try { b.setPointerCapture(e.pointerId); } catch {} jog(b.dataset.jog); });
+['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev => $('#jog').addEventListener(ev, e => { if (e.target.closest?.('[data-jog]') && jogT){ clearInterval(jogT); jogT = 0; if (BLE.connected) BLE.setLatest('S'); } }));
+window.addEventListener('resize', moveInd);
+document.fonts?.ready.then(moveInd);
+
+// live controls
+$('#armBtn').addEventListener('pointerdown', e => { if (e.button === 0){ e.preventDefault(); Robot.toggle(); } });   // react on press, not release (no lag)
+$('#armBtn').addEventListener('keydown', e => { if (e.key === 'Enter') Robot.toggle(); });
+for (const [id, k, fn] of [['trim', 'trim', Number], ['steady', 'steady', Number], ['strict', 'strict', Number]]){
+  $('#' + id).addEventListener('input', e => { S[k] = fn(e.target.value); setRange(e.target); renderSettingsOut(); saveSettings(); renderLegend(); if (k === 'trim'){ if (BLE.connected) BLE.send('TR,' + S.trim); Code.changed(); } });
+}
+document.addEventListener('keydown', e => {
+  if (e.target.matches('input,textarea')) return;
+  if (e.code === 'Space' && S.view === 'app' && S.mode === 'live'){ e.preventDefault(); Robot.toggle(); }
+});
+document.addEventListener('visibilitychange', () => { if (document.hidden && Robot.running){ Robot.stop(); toast('Program stopped because the app went to the background', 'warn'); } });
+
+// demo animation on the landing page
+let demoI = 0; setInterval(() => { const cs = $$('#demoCards .gcard'); cs.forEach((c, i) => c.classList.toggle('on', i === demoI % cs.length)); demoI++; }, 1400);
+
+/* =====================================================================
+   START
+   ===================================================================== */
+$('#footYear').textContent = new Date().getFullYear();
+renderLogos();
+Gauge.build();
+Model.load();
+renderAll();
+setView('home');
+requestAnimationFrame(() => document.body.classList.add('loaded'));
+requestAnimationFrame(frame);
+Engine.loop();
+</script>
+</body>
+</html>

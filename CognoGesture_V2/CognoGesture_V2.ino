@@ -5,19 +5,19 @@
    the Cogno Gesture app and upload them over Bluetooth. The program is
    saved on the ESP32 and stays there after power off.
 
-   Kit: ESP32 · L298N motor driver · 2 DC motors · 20x4 I2C LCD ·
-        0.96" I2C OLED (SSD1306 128x64) · battery pack
+   Kit: ESP32 · L298N motor driver · 2 DC motors · 20x4 I2C LCD · battery pack
+        (an optional 0.96" SSD1306 OLED is supported: set USE_OLED to 1)
 
    Arduino IDE  ->  Board: "ESP32 Dev Module"
    Libraries (Library Manager):
      - LiquidCrystal I2C  (Frank de Brabander)
-     - Adafruit SSD1306   (+ Adafruit GFX, installed with it)
+     - (only if USE_OLED is 1: Adafruit SSD1306 + Adafruit GFX)
    Works on ESP32 Arduino core 2.x and 3.x.
 
    Wiring (change the pins below if yours differ)
      L298N  ENA -> 14   IN1 -> 27   IN2 -> 26
             ENB -> 32   IN3 -> 25   IN4 -> 33     (remove the ENA/ENB jumpers)
-     LCD + OLED share I2C:  SDA -> 21   SCL -> 22   VCC -> 5V / 3V3   GND -> GND
+     LCD (I2C):  SDA -> 21   SCL -> 22   VCC -> 5V   GND -> GND
      Built-in LED: GPIO 2
    ===================================================================== */
 #include <Arduino.h>
@@ -36,7 +36,7 @@
 
 /* ---------- set to 0 if a display is not in your kit ---------- */
 #define USE_LCD  1
-#define USE_OLED 1
+#define USE_OLED 0   /* your kit has no OLED. Set to 1 (and install Adafruit SSD1306) if you add one */
 #if USE_LCD
   #include <LiquidCrystal_I2C.h>
 #endif
