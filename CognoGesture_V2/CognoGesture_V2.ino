@@ -14,9 +14,13 @@
      - (only if USE_OLED is 1: Adafruit SSD1306 + Adafruit GFX)
    Works on ESP32 Arduino core 2.x and 3.x.
 
-   Wiring (change the pins below if yours differ)
-     L298N  ENA -> 14   IN1 -> 27   IN2 -> 26
-            ENB -> 32   IN3 -> 25   IN4 -> 33     (remove the ENA/ENB jumpers)
+   Board: "ESP32 Dev Module"   Partition scheme: "Huge APP (3MB No OTA/1MB SPIFFS)"
+          (BLE is big; the 1MB SPIFFS part is where the uploaded program is saved)
+
+   Wiring (same as Welcome Robot; change the pins below if yours differ)
+     L298N  ENA -> 25   IN1 -> 26   IN2 -> 27     (left motor)
+            ENB -> 13   IN3 -> 32   IN4 -> 33     (right motor)
+            Remove the ENA/ENB jumpers. L298N GND must join ESP32 GND.
      LCD (I2C):  SDA -> 21   SCL -> 22   VCC -> 5V   GND -> GND
      Built-in LED: GPIO 2
    ===================================================================== */
@@ -47,8 +51,9 @@
 
 /* ---------- SETTINGS YOU MAY WANT TO CHANGE ---------- */
 const char* DEVICE_NAME = "CognoGesture-Bot";   // the app looks for names starting with "CognoGesture"
-const int ENA = 14, IN1 = 27, IN2 = 26;         // left motor
-const int ENB = 32, IN3 = 25, IN4 = 33;         // right motor
+const int ENA = 25, IN1 = 26, IN2 = 27;         // left motor   (Welcome Robot wiring)
+const int ENB = 13, IN3 = 32, IN4 = 33;         // right motor
+const int MIN_PWM = 90;                         // lowest PWM that still turns BO motors (0-255)
 const int LED_PIN = 2;
 const int SDA_PIN = 21, SCL_PIN = 22;
 const bool INVERT_LEFT = false, INVERT_RIGHT = false, SWAP_SIDES = false;   // fix a motor that spins the wrong way
@@ -117,8 +122,9 @@ void pwmOut(int pin, int ch, int duty){
 }
 void wheel(int en, int ch, int a, int b, int v){
   v = constrain(v, -100, 100);
+  if (abs(v) < 8){ digitalWrite(a, LOW); digitalWrite(b, LOW); pwmOut(en, ch, 0); return; }   // dead zone = stop
   digitalWrite(a, v > 0 ? HIGH : LOW); digitalWrite(b, v < 0 ? HIGH : LOW);
-  pwmOut(en, ch, abs(v) * 255 / 100);
+  pwmOut(en, ch, map(abs(v), 0, 100, MIN_PWM, 255));     // 1..100% -> MIN_PWM..255 so slow speeds still move
 }
 void setMotors(int l, int r){
   l = constrain(l, -100, 100); r = constrain(r, -100, 100);
@@ -397,7 +403,7 @@ void setup(){
   Serial.begin(115200);
   pinMode(IN1, OUTPUT); pinMode(IN2, OUTPUT); pinMode(IN3, OUTPUT); pinMode(IN4, OUTPUT); pinMode(LED_PIN, OUTPUT);
   pwmInit(); setMotors(0, 0);
-  Wire.begin(SDA_PIN, SCL_PIN); Wire.setClock(400000);
+  Wire.begin(SDA_PIN, SCL_PIN); Wire.setClock(100000);
 #if USE_LCD
   for (uint8_t a : {0x27, 0x3F}) if (i2cHas(a)){ lcd = new LiquidCrystal_I2C(a, 20, 4); lcd->init(); lcd->backlight(); lcdOk = true; break; }
 #endif
