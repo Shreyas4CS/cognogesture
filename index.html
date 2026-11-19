@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=7">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -87,12 +87,12 @@
         <div class="seg" id="modeSeg">
           <span class="seg-ind" id="segInd"></span>
           <button data-mode="collect" class="on" title="1 · Collect data"><svg class="i"><use href="#i-db"/></svg><span>Collect</span></button>
-          <button data-mode="code" title="2 · Code &amp; test the robot"><svg class="i"><use href="#i-code"/></svg><span>Code</span></button>
-          <button data-mode="train" title="3 · Train, compare &amp; deploy a model"><svg class="i"><use href="#i-brain"/></svg><span>Train</span></button>
+          <button data-mode="train" title="2 · Train &amp; compare models"><svg class="i"><use href="#i-brain"/></svg><span>Train</span></button>
+          <button data-mode="code" title="3 · Code &amp; test the robot"><svg class="i"><use href="#i-code"/></svg><span>Code</span></button>
           <button data-mode="live" title="4 · Live (unlocks after you deploy a model)"><svg class="i lk"><use href="#i-lock"/></svg><svg class="i ul"><use href="#i-play"/></svg><span>Live</span></button>
         </div>
         <button class="navbtn navbtn--ble" id="bleBtn" title="Connect the robot over Bluetooth"><i class="dot" id="bleDot"></i><svg class="i"><use href="#i-bt"/></svg><span id="bleTxt">Connect robot</span></button>
-        <button class="navbtn navbtn--icon" id="clearBtn" title="Clear all data saved on this device (gestures, pictures, code, models)"><svg class="i"><use href="#i-trash"/></svg></button>
+        <button class="navbtn navbtn--icon" id="clearBtn" title="Clear all training data saved on this device"><svg class="i"><use href="#i-trash"/></svg></button>
         <button class="navbtn" id="homeBtn" title="Back to home (your training is kept)"><svg class="i"><use href="#i-home"/></svg><span>Home</span></button>
       </div>
     </nav>
@@ -144,12 +144,12 @@
     <div class="shell">
       <div class="section__head">
         <h2>How it works</h2>
-        <p>Collect the data, program what the robot should do with blocks, then train and fairly test four AI models and deploy the best one.</p>
+        <p>The same path real AI engineers follow: collect data, train models, test them fairly, deploy the best one, then program what the robot does with it.</p>
       </div>
       <div class="steps">
         <div class="step"><span class="si"><svg class="i"><use href="#i-db"/></svg></span><h3>Collect data</h3><p>Add gestures (hand signs, faces or objects), hold Record for 50–150 pictures each, and set the robot's default PWM speed.</p></div>
-        <div class="step"><span class="si"><svg class="i"><use href="#i-code"/></svg></span><h3>Code &amp; test</h3><p>Snap blocks together: “when ☝️ is seen → move forward”, loops, functions and LCD messages. Upload over Bluetooth and test.</p></div>
         <div class="step"><span class="si"><svg class="i"><use href="#i-brain"/></svg></span><h3>Train &amp; deploy</h3><p>KNN, Neural Network, SVM and Random Forest learn from the same pictures. Try each one on the camera, then deploy the best.</p></div>
+        <div class="step"><span class="si"><svg class="i"><use href="#i-code"/></svg></span><h3>Code &amp; test</h3><p>Snap blocks together: “when ☝️ is seen → move forward”, loops, functions, LCD and OLED messages. Upload over Bluetooth and test.</p></div>
         <div class="step"><span class="si"><svg class="i"><use href="#i-gauge"/></svg></span><h3>Drive live</h3><p>Race the maze with a live speedometer. Anything the robot was not taught keeps it still.</p></div>
       </div>
     </div>
@@ -179,7 +179,7 @@
           <div class="kitem"><span class="ki"><svg class="i"><use href="#i-chip"/></svg></span><b>ESP32</b><small>the robot's brain · Bluetooth</small></div>
           <div class="kitem"><span class="ki"><svg class="i"><use href="#i-motor"/></svg></span><b>2 DC motors + L298N</b><small>wheels with PWM speed control</small></div>
           <div class="kitem"><span class="ki"><svg class="i"><use href="#i-screen"/></svg></span><b>20×4 I2C LCD</b><small>show messages and status</small></div>
-          <div class="kitem"><span class="ki"><svg class="i"><use href="#i-bulb"/></svg></span><b>Status light</b><small>the ESP32's built-in LED</small></div>
+          <div class="kitem"><span class="ki"><svg class="i"><use href="#i-face"/></svg></span><b>0.96" OLED</b><small>robot eyes and big text</small></div>
           <div class="kitem"><span class="ki"><svg class="i"><use href="#i-power"/></svg></span><b>Battery pack</b><small>with switch</small></div>
           <div class="kitem"><span class="ki"><svg class="i"><use href="#i-maze"/></svg></span><b>Chassis + wires</b><small>ready for the expo maze</small></div>
         </div>
@@ -187,10 +187,10 @@
       <details class="panel more wiring">
         <summary><svg class="i"><use href="#i-chip"/></svg>Wiring for mentors<svg class="i car"><use href="#i-chev"/></svg></summary>
         <div class="wtable">
-          <div><b>L298N ENA</b><span>GPIO 25</span></div><div><b>IN1 / IN2</b><span>GPIO 26 / 27</span></div>
-          <div><b>L298N ENB</b><span>GPIO 13</span></div><div><b>IN3 / IN4</b><span>GPIO 32 / 33</span></div>
-          <div><b>LCD SDA</b><span>GPIO 21</span></div><div><b>LCD SCL</b><span>GPIO 22</span></div>
-          <div><b>LCD address</b><span>0x27 or 0x3F (auto)</span></div><div><b>LCD power</b><span>5V and GND</span></div>
+          <div><b>L298N ENA</b><span>GPIO 14</span></div><div><b>IN1 / IN2</b><span>GPIO 27 / 26</span></div>
+          <div><b>L298N ENB</b><span>GPIO 32</span></div><div><b>IN3 / IN4</b><span>GPIO 25 / 33</span></div>
+          <div><b>LCD + OLED SDA</b><span>GPIO 21</span></div><div><b>LCD + OLED SCL</b><span>GPIO 22</span></div>
+          <div><b>LCD address</b><span>0x27 or 0x3F (auto)</span></div><div><b>OLED address</b><span>0x3C (auto)</span></div>
         </div>
       </details>
     </div>
@@ -201,7 +201,7 @@
       <div class="callout">
         <div>
           <h2>Ready for CognoQuest?</h2>
-          <p>Switch on the robot, open the app, and go: Collect → Code → Train → Live.</p>
+          <p>Switch on the robot, open the app, and go: Collect → Train → Code → Live.</p>
         </div>
         <button class="btn btn--brand btn--lg" id="ctaStart">Open the app</button>
       </div>
@@ -217,7 +217,7 @@
         <p class="foot__blurb">CognoSpace builds experiential learning for schools: STEM, robotics, IoT and AI, hands on.</p>
         <a class="foot__site" href="https://www.cognospace.in" target="_blank" rel="noopener">www.cognospace.in <svg class="i" style="width:14px;height:14px"><use href="#i-arrow"/></svg></a>
       </div>
-      <nav class="foot__col"><h3>App</h3><a href="#" data-go="collect">Collect data</a><a href="#" data-go="code">Code blocks</a><a href="#" data-go="train">Train models</a><a href="#" data-go="live">Live drive</a><a href="#how">How it works</a></nav>
+      <nav class="foot__col"><h3>App</h3><a href="#" data-go="collect">Collect data</a><a href="#" data-go="train">Train models</a><a href="#" data-go="code">Code blocks</a><a href="#" data-go="live">Live drive</a><a href="#how">How it works</a></nav>
       <nav class="foot__col"><h3>Requirements</h3><span>Chrome or Edge</span><span>A camera</span><span>ESP32 with BLE</span><span>Data stays on your device</span></nav>
       <div class="foot__col"><h3>Built with</h3><span>MediaPipe vision</span><span>KNN · Neural Network</span><span>SVM · Random Forest</span><span>Blockly · Web Bluetooth</span></div>
     </div>
@@ -280,7 +280,7 @@
         <div class="panel__head"><h2><svg class="i"><use href="#i-eye"/></svg>What the AI sees now</h2><div class="r"><span class="tag" id="predBrain">KNN</span></div></div>
         <div class="panel__body preds" id="preds"><div class="hint">Turn on the camera and add a gesture to see live predictions.</div></div>
       </div>
-      <button class="nextcta" id="toTrain"><span class="ni"><svg class="i"><use href="#i-code"/></svg></span><span><b>Next: code your robot with blocks</b><small id="toTrainSub">0 gestures · 0 pictures</small></span><span class="go"><span>Code</span><svg class="i"><use href="#i-next"/></svg></span></button>
+      <button class="nextcta" id="toTrain"><span class="ni"><svg class="i"><use href="#i-brain"/></svg></span><span><b>Next: train &amp; compare models</b><small id="toTrainSub">0 gestures · 0 pictures</small></span><span class="go"><span>Train</span><svg class="i"><use href="#i-next"/></svg></span></button>
       <div class="tipbox"><svg class="i"><use href="#i-bulb"/></svg><div><b>More pictures = more accurate.</b> Record each gesture 50–150 times: move it closer and farther, tilt it a little, try both hands if you will use both. Add <b>Speed gestures</b> (e.g. two fingers = 20%) to change the PWM speed. Record <b>No gesture</b> with your hand relaxed or out of view so the robot learns when to stay still.</div></div>
       <input type="file" id="importFile" accept=".json,application/json" hidden>
       <input type="file" id="upFile" accept="image/*" multiple hidden>
@@ -347,7 +347,7 @@
   <section class="lab" id="trainView" hidden>
     <div class="lab-head">
       <div>
-        <span class="eyebrow"><b>STEP 3</b> · Train, compare &amp; deploy</span>
+        <span class="eyebrow"><b>STEP 2</b> · Train &amp; compare</span>
         <h1>Which <span>AI brain</span> drives best?</h1>
         <p>Your pictures are split in two. Most of them teach the four algorithms; the rest stay hidden and are used as a test. The model that gets the most hidden pictures right is the one to trust in Live.</p>
       </div>
@@ -438,16 +438,6 @@
   </section>
 </div>
 
-<div class="modal" id="exModal" hidden>
-  <div class="modal__scrim" data-close></div>
-  <div class="modal__box exbox">
-    <h3>Load an example program</h3>
-    <p>Your current blocks will be replaced.</p>
-    <button class="exopt" data-ex="each"><span class="exi" style="--cc:var(--cat-ge)"><svg class="i"><use href="#i-hand"/></svg></span><span><b>One script per gesture</b><small>“when Forward is seen → start moving forward”, “when Left is seen → turn left”… Built from your gestures, with LCD messages. Easy to change each action.</small></span></button>
-    <button class="exopt" data-ex="follow"><span class="exi" style="--cc:var(--cat-mo)"><svg class="i"><use href="#i-play"/></svg></span><span><b>Drive by gestures</b><small>One block does every move you picked in Collect. Shortest program.</small></span></button>
-    <div class="modal__acts" style="margin-top:1rem"><button class="btn" data-close>Cancel</button></div>
-  </div>
-</div>
 <div class="modal" id="confirmModal" hidden>
   <div class="modal__scrim" data-close></div>
   <div class="modal__box"><h3 id="cfT">Are you sure?</h3><p id="cfP"></p><div class="modal__acts"><button class="btn" data-close>Cancel</button><button class="btn btn--brand" id="cfOk">Yes</button></div></div>
@@ -484,14 +474,6 @@ const LS = {
   get(k, d){ try { const v = localStorage.getItem('cg.' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
   set(k, v){ try { localStorage.setItem('cg.' + k, JSON.stringify(v)); return true; } catch { return false; } },
   del(k){ try { localStorage.removeItem('cg.' + k); } catch {} }
-};
-/* IndexedDB: much bigger than localStorage (hundreds of MB), used for the training pictures */
-const IDB = {
-  db:null,
-  open(){ return this.db || (this.db = new Promise((res, rej) => { const r = indexedDB.open('cognogesture', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); })); },
-  async get(k){ const db = await this.open(); return new Promise((res, rej) => { const q = db.transaction('kv').objectStore('kv').get(k); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); },
-  async set(k, v){ const db = await this.open(); return new Promise((res, rej) => { const t = db.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = () => res(true); t.onerror = () => rej(t.error); }); },
-  async del(k){ const db = await this.open(); return new Promise(res => { const t = db.transaction('kv', 'readwrite'); t.objectStore('kv').delete(k); t.oncomplete = () => res(); t.onerror = () => res(); }); }
 };
 function toast(msg, kind=''){
   const t = document.createElement('div'); t.className = 'toast ' + kind; t.textContent = msg; $('#toasts').appendChild(t);
@@ -893,22 +875,14 @@ const Model = {
   saveT:null,
   changed(){ clearTimeout(this.saveT); this.saveT = setTimeout(() => this.save(), 400); this.calib(); const t = document.getElementById('saveTag'); if (t){ t.textContent = 'Saving…'; t.className = 'tag'; } Code.cache = null; renderModelUI(); },
   savedAt:LS.get('savedAt', 0), bytes:0,
-  async save(){
+  save(){
     const j = JSON.stringify(this.pack());
-    let ok = true; try { await IDB.set('data', j); } catch (e) { console.warn(e); ok = false; }
+    let ok = true; try { localStorage.setItem('cg.data', j); } catch { ok = false; }
     if (ok){ this.savedAt = Date.now(); this.bytes = j.length; LS.set('savedAt', this.savedAt); }
-    else toast('Could not save your pictures on this device. Use Export to keep a copy.', 'warn');
+    else toast('Browser storage is full. Use Export to keep a copy, or delete some pictures.', 'warn');
     renderData(ok);
   },
-  /* pictures live in IndexedDB; older versions kept them in localStorage, so move them over once */
-  async load(){
-    let raw = null;
-    try { raw = await IDB.get('data'); } catch (e) { console.warn(e); }
-    if (!raw){ try { raw = localStorage.getItem('cg.data'); } catch {} if (raw){ try { await IDB.set('data', raw); localStorage.removeItem('cg.data'); } catch {} } }
-    this.bytes = raw ? raw.length : 0;
-    if (raw){ try { this.unpack(JSON.parse(raw)); return; } catch (e) { console.warn(e); } }
-    this.reset();
-  }
+  load(){ let raw = null; try { raw = localStorage.getItem('cg.data'); } catch {} this.bytes = raw ? raw.length : 0; if (raw){ try { this.unpack(JSON.parse(raw)); return; } catch (e) { console.warn(e); } } this.reset(); }
 };
 function dist(a, b){ let s = 0; for (let i = 0; i < a.length; i++){ const d = a[i] - b[i]; s += d*d; } return Math.sqrt(s*3/a.length); }
 
@@ -1117,7 +1091,7 @@ const Brain = {
     this.dep = {key, acc:Lab.res[key]?.state === 'done' ? Lab.res[key].acc : null, sig:Model.sig()}; LS.set('deploy', this.dep);
     if (!this.probe) this.probe = key;
     logEvent(`${ALGOS[key].name} deployed`); renderModelUI();
-    toast(`${ALGOS[key].name} deployed. Live is unlocked.`, 'ok');
+    toast(`${ALGOS[key].name} deployed. Code and Live are unlocked.`, 'ok');
   },
   /* one kind of input (hand / face / object) → {c, conf, list} or {c:null, why} */
   classify(m, k, word, feat){
@@ -1544,7 +1518,7 @@ function renderTrain(){
   list.querySelectorAll('input[data-speed]').forEach(setRange);
 }
 function renderData(ok=true){
-  if (!$('#dsG')){ $('#clearBtn').title = `Clear all data on this device (${Model.classes.length - 1} gestures, ${Model.total()} pictures, code, models)`; return; }
+  if (!$('#dsG')){ $('#clearBtn').title = `Clear all training data on this device (${Model.classes.length - 1} gestures, ${Model.total()} pictures)`; return; }
   const g = Model.classes.filter(c => !c.bg).length, kb = Model.bytes/1024;
   $('#dsG').textContent = g; $('#dsP').textContent = Model.total();
   $('#dsK').textContent = kb >= 1024 ? (kb/1024).toFixed(1) + ' MB' : Math.round(kb) + ' KB';
@@ -1791,14 +1765,14 @@ function renderLabGo(){
   const ok = Brain.deployed(), A = ok && ALGOS[Brain.dep.key];
   el.classList.toggle('dim', !ok);
   el.innerHTML = ok
-    ? `<span class="ni"><svg class="i"><use href="#i-play"/></svg></span><span><b>Next: Live · ${A.name} is deployed</b><small>${Brain.dep.acc != null ? fmtPct(Brain.dep.acc) + ' accurate on hidden test pictures · ' : ''}race the maze with your program</small></span><span class="go"><span>Go Live</span><svg class="i"><use href="#i-next"/></svg></span>`
-    : `<span class="ni"><svg class="i"><use href="#i-lock"/></svg></span><span><b>Deploy a model to unlock Live</b><small>Test the 4 models, tap Try to watch each one on the camera, then Deploy the best.</small></span><span class="go"><span>Live</span><svg class="i"><use href="#i-lock"/></svg></span>`;
+    ? `<span class="ni"><svg class="i"><use href="#i-code"/></svg></span><span><b>${A.name} is deployed</b><small>${Brain.dep.acc != null ? fmtPct(Brain.dep.acc) + ' accurate on hidden test pictures · ' : ''}now program what the robot does</small></span><span class="go"><span>Code it</span><svg class="i"><use href="#i-next"/></svg></span>`
+    : `<span class="ni"><svg class="i"><use href="#i-lock"/></svg></span><span><b>Deploy a model to unlock Live</b><small>Test the 4 models, tap Try to watch each one on the camera, then Deploy the best.</small></span><span class="go"><span>Code</span><svg class="i"><use href="#i-next"/></svg></span>`;
 }
 function renderToLive(){
   const el = $('#toLive'); if (!el) return;
   const ok = Brain.deployed();
-  el.classList.remove('dim');
-  el.innerHTML = `<span class="ni"><svg class="i"><use href="#i-brain"/></svg></span><span><b>Next: train &amp; deploy a model</b><small>${ok ? ALGOS[Brain.dep.key].name + ' is deployed · you can still compare and change it' : 'Compare the 4 models, then deploy one to unlock Live'}</small></span><span class="go"><span>Train</span><svg class="i"><use href="#i-next"/></svg></span>`;
+  el.classList.toggle('dim', !ok);
+  el.innerHTML = `<span class="ni"><svg class="i"><use href="#${ok ? 'i-play' : 'i-lock'}"/></svg></span><span><b>${ok ? 'Next: Live' : 'Live is locked'}</b><small>${ok ? 'Race the maze with ' + ALGOS[Brain.dep.key].name : 'Deploy a model in Train first'}</small></span><span class="go"><span>${ok ? 'Go Live' : 'Train'}</span><svg class="i"><use href="#i-next"/></svg></span>`;
 }
 
 /* =====================================================================
@@ -1855,40 +1829,18 @@ const CATS = [['Events', 'ev', 'play'], ['Gestures', 'ge', 'hand'], ['Motion', '
 
 /* the program that appears the first time */
 /* recommended program: the robot follows your gestures, the screens show what it sees */
-/* LCD layout used by the examples:
-   row 1 title · row 2 AI model + speed · row 3 what the robot is doing · row 4 what the camera sees */
 const DEFAULT_PROGRAM = {blocks:{languageVersion:0, blocks:[
-  {type:'cq_start', x:30, y:30, next:{block:{type:'cq_lcd', fields:{ROW:'0', TXT:'COGNOQUEST ROBOT'}, next:{block:{type:'cq_lcd', fields:{ROW:'1', TXT:'AI:{m} Speed:{s}'}, next:{block:{type:'cq_lcd', fields:{ROW:'2', TXT:'Driving by gestures'}, next:{block:{type:'cq_follow'}}}}}}}}},
-  {type:'cq_when_g', x:30, y:330, fields:{G:'__any'}, next:{block:{type:'cq_show_g', fields:{T:'lcd'}, next:{block:{type:'cq_lcd', fields:{ROW:'1', TXT:'AI:{m} Speed:{s}'}, next:{block:{type:'cq_led', fields:{ON:'1'}}}}}}}},
-  {type:'cq_when_none', x:30, y:560, next:{block:{type:'cq_lcd', fields:{ROW:'3', TXT:'Show a gesture'}, next:{block:{type:'cq_led', fields:{ON:'0'}}}}}}
+  {type:'cq_start', x:30, y:30, next:{block:{type:'cq_lcd', fields:{ROW:'0', TXT:'COGNOQUEST ROBOT'}, next:{block:{type:'cq_lcd', fields:{ROW:'1', TXT:'AI: {m}'}, next:{block:{type:'cq_lcd', fields:{ROW:'2', TXT:'Speed: {s}'}, next:{block:{type:'cq_face', fields:{K:'0'}, next:{block:{type:'cq_follow'}}}}}}}}}}},
+  {type:'cq_when_g', x:30, y:330, fields:{G:'__any'}, next:{block:{type:'cq_show_g', fields:{T:'lcd'}, next:{block:{type:'cq_lcd', fields:{ROW:'2', TXT:'Speed: {s}'}, next:{block:{type:'cq_face', fields:{K:'0'}, next:{block:{type:'cq_led', fields:{ON:'1'}}}}}}}}}},
+  {type:'cq_when_none', x:30, y:560, next:{block:{type:'cq_lcd', fields:{ROW:'3', TXT:'Show a gesture'}, next:{block:{type:'cq_face', fields:{K:'4'}, next:{block:{type:'cq_led', fields:{ON:'0'}}}}}}}}
 ]}};
-
-/* example 2: one script per gesture, built from your own gestures and the moves picked in Collect */
-const ACT_WORD = {forward:'FORWARD', backward:'REVERSE', left:'LEFT', right:'RIGHT', curveL:'FWD LEFT', curveR:'FWD RIGHT', backL:'BACK LEFT', backR:'BACK RIGHT', stop:'STOP'};
-function exampleEachAction(){
-  const chain = list => list.reduceRight((next, b) => next ? {...b, next:{block:next}} : b, null);
-  const lcd = (row, t) => ({type:'cq_lcd', fields:{ROW:String(row), TXT:t}});
-  const blocks = [{x:30, y:30, ...chain([{type:'cq_start'}, lcd(0, 'COGNOQUEST ROBOT'), lcd(1, 'AI:{m} Speed:{s}'), lcd(2, 'Move: STOP'), {type:'cq_stop'}])}];
-  const gs = Model.classes.filter(c => !c.bg);
-  gs.forEach((c, i) => {
-    const pos = {x:30 + (i % 2)*470, y:300 + Math.floor(i/2)*230}, head = [{type:'cq_when_g', fields:{G:c.id}}, {type:'cq_show_g', fields:{T:'lcd'}}];
-    let body;
-    if (c.action === 'speed') body = [{type:'cq_speed', fields:{PCT:c.speed || 50}}, {type:'cq_stop'}, lcd(1, 'AI:{m} Speed:{s}'), lcd(2, 'Move: STOP')];
-    else if (c.action === 'stop') body = [{type:'cq_stop'}, lcd(2, 'Move: STOP')];
-    else body = [{type:'cq_go', fields:{DIR:c.action}}, lcd(2, 'Move: ' + (ACT_WORD[c.action] || 'GO'))];
-    blocks.push({...pos, ...chain([...head, ...body])});
-  });
-  const y = 300 + Math.ceil(gs.length/2)*230;
-  blocks.push({x:30, y, ...chain([{type:'cq_when_none'}, {type:'cq_stop'}, lcd(2, 'Move: STOP'), lcd(3, 'Show a gesture')])});
-  return {blocks:{languageVersion:0, blocks}};
-}
 
 const Code = {
   ws:null, loading:null, cache:null, saveT:0,
   name(){ return ascii($('#progName').value).trim().slice(0, 20) || 'My robot'; },
   open(){
     renderRobot(); renderRun(); renderCats();
-    if (this.ws){ this.refreshToolbox(); requestAnimationFrame(() => { Blockly.svgResize(this.ws); this.show(); }); this.changed(); return; }
+    if (this.ws){ this.refreshToolbox(); requestAnimationFrame(() => Blockly.svgResize(this.ws)); this.changed(); return; }
     if (!this.loading) this.loading = this.boot().catch(e => {
       console.warn(e); this.loading = null;
       $('#wsMsg').innerHTML = '<svg class="i" style="color:var(--warn)"><use href="#i-warn"/></svg><span>The block editor loads from the internet the first time. Check the connection and open Code again.</span>';
@@ -1904,24 +1856,14 @@ const Code = {
       zoom:{controls:true, wheel:true, startScale:matchMedia('(max-width:640px)').matches ? .72 : .95, maxScale:1.8, minScale:.4, scaleSpeed:1.15},
       move:{scrollbars:true, drag:true, wheel:false}
     });
-    let saved = LS.get('blocks', null); if (!saved){ try { saved = await IDB.get('blocks'); } catch {} }
-    try { Blockly.serialization.workspaces.load(saved || DEFAULT_PROGRAM, this.ws); }
+    try { Blockly.serialization.workspaces.load(LS.get('blocks', null) || DEFAULT_PROGRAM, this.ws); }
     catch (e) { console.warn(e); this.ws.clear(); Blockly.serialization.workspaces.load(DEFAULT_PROGRAM, this.ws); }
     this.ws.addChangeListener(e => { if (e.isUiEvent) return; this.cache = null; clearTimeout(this.saveT); this.saveT = setTimeout(() => this.save(), 250); });
-    new ResizeObserver(() => { if ($('#blockly').offsetWidth && this.ws) Blockly.svgResize(this.ws); }).observe($('#blockly'));   // skip while the page is hidden
+    new ResizeObserver(() => Blockly.svgResize(this.ws)).observe($('#blockly'));
     $('#wsMsg').hidden = true;
-    requestAnimationFrame(() => this.show());
     this.changed();
   },
-  save(){
-    if (!this.ws) return;
-    const j = Blockly.serialization.workspaces.save(this.ws);
-    if (!LS.set('blocks', j)){ IDB.set('blocks', j).catch(() => {}); if (!this.warned){ this.warned = true; toast('Browser storage is nearly full. Your blocks are saved in the bigger storage instead.', 'warn'); } }
-    else IDB.del('blocks');
-    this.changed();
-  },
-  /* scroll so the first script is in view (it can drift off-screen while the page was hidden) */
-  show(){ const tops = this.ws.getTopBlocks(true); if (tops.length) this.ws.centerOnBlock(tops[0].id); },
+  save(){ if (!this.ws) return; LS.set('blocks', Blockly.serialization.workspaces.save(this.ws)); this.changed(); },
   changed(){ this.cache = null; renderRun(); renderProgCard(); },
   cat:'ev',
   pick(k){ this.cat = k; renderCats(); if (this.ws){ this.ws.updateToolbox(toolbox()); this.ws.getFlyout()?.scrollToStart?.(); } },
@@ -1991,7 +1933,7 @@ function defineBlocks(){
     // display
     {type:'cq_lcd', message0:'LCD row %1 show %2', args0:[{type:'field_dropdown', name:'ROW', options:[['1', '0'], ['2', '1'], ['3', '2'], ['4', '3']]}, {type:'field_input', name:'TXT', text:'Hello!'}], ...S_, style:'di', tooltip:'20 characters per row. ' + txtTip},
     {type:'cq_lcd_clear', message0:'clear LCD', ...S_, style:'di'},
-    {type:'cq_show_g', message0:'show seen gesture on LCD row %1', args0:[{type:'field_dropdown', name:'T', options:[['4', 'lcd'], ['1', 'lcd0'], ['2', 'lcd1'], ['3', 'lcd2']]}], ...S_, style:'di'},
+    {type:'cq_show_g', message0:'show seen gesture on %1', args0:[{type:'field_dropdown', name:'T', options:[['LCD', 'lcd'], ['OLED', 'oled']]}], ...S_, style:'di'},
     {type:'cq_oled', message0:'OLED line %1 show %2 %3', args0:[{type:'field_dropdown', name:'LINE', options:[['1', '0'], ['2', '1'], ['3', '2'], ['4', '3'], ['5', '4'], ['6', '5'], ['7', '6'], ['8', '7']]}, {type:'field_input', name:'TXT', text:'Hi!'}, {type:'field_dropdown', name:'SIZE', options:[['big', '2'], ['small', '1']]}], ...S_, style:'di', tooltip:'Big text: 4 lines of 10 letters. Small: 8 lines of 21. ' + txtTip},
     {type:'cq_face', message0:'OLED eyes %1', args0:[{type:'field_dropdown', name:'K', options:FACES}], ...S_, style:'di'},
     {type:'cq_oled_clear', message0:'clear OLED', ...S_, style:'di'},
@@ -2013,7 +1955,7 @@ function toolbox(){
   const contents = {ev:[B('cq_start'), B('cq_when_g'), B('cq_when_none')], ge:gBlocks,
     mo:[B('cq_move'), B('cq_go'), B('cq_stop'), B('cq_speed'), B('cq_follow')],
     ct:[B('cq_wait'), B('cq_repeat'), B('cq_forever'), B('cq_if'), B('cq_ifelse'), B('cq_until'), B('cq_wait_g'), B('cq_halt')],
-    di:[B('cq_lcd'), B('cq_show_g'), B('cq_lcd_clear')],
+    di:[B('cq_lcd'), B('cq_show_g'), B('cq_lcd_clear'), B('cq_oled'), B('cq_face'), B('cq_oled_clear')],
     li:[B('cq_led'), B('cq_vset'), B('cq_vadd')], fn:[B('cq_def'), B('cq_call')]};
   const name = (CATS.find(c => c[1] === Code.cat) || CATS[0])[0];
   return {kind:'flyoutToolbox', contents:[{kind:'label', text:name}, ...contents[Code.cat]]};
@@ -2054,7 +1996,7 @@ function compileProgram(ws, name){
       case 'cq_halt': emit(OP.HALT); break;
       case 'cq_lcd': emit(OP.LCD, +f('ROW'), str(f('TXT'))); break;
       case 'cq_lcd_clear': emit(OP.LCDCLR); break;
-      case 'cq_show_g': { const t = f('T'); t === 'oled' ? emit(OP.OLED, 3, str('{g}'), 2) : emit(OP.LCD, t === 'lcd' ? 3 : +t.slice(3), str('Seen: {g}')); break; }
+      case 'cq_show_g': f('T') === 'lcd' ? emit(OP.LCD, 3, str('Seen: {g}')) : emit(OP.OLED, 3, str('{g}'), 2); break;
       case 'cq_oled': emit(OP.OLED, +f('LINE'), str(f('TXT')), +f('SIZE')); break;
       case 'cq_face': emit(OP.FACE, +f('K')); break;
       case 'cq_oled_clear': emit(OP.OLEDCLR); break;
@@ -2097,7 +2039,7 @@ function renderRobot(){
   if (el) el.innerHTML = !BLE.connected
     ? '<span class="hint">Switch the robot on. Its screens say “Waiting for app”. Then connect.</span>'
     : !i ? '<span class="hint"><i class="spin dark"></i> Talking to the robot…</span>'
-    : [[i.lcd, 'LCD 20×4'], ...(i.oled ? [[true, 'OLED']] : []), [i.has, i.has ? 'Program: ' + esc(i.name || 'saved') : 'No program yet']].map(([ok, t]) => `<span class="rchip ${ok ? 'ok' : ''}"><svg class="i"><use href="#${ok ? 'i-check' : 'i-x'}"/></svg>${t}</span>`).join('') + `<span class="rchip">FW ${esc(i.fw || '?')}</span>`;
+    : [[i.lcd, 'LCD 20×4'], [i.oled, 'OLED'], [i.has, i.has ? 'Program: ' + esc(i.name || 'saved') : 'No program yet']].map(([ok, t]) => `<span class="rchip ${ok ? 'ok' : ''}"><svg class="i"><use href="#${ok ? 'i-check' : 'i-x'}"/></svg>${t}</span>`).join('') + `<span class="rchip">FW ${esc(i.fw || '?')}</span>`;
   renderProgCard();
 }
 function renderProgCard(){
@@ -2269,25 +2211,15 @@ $('#importFile').onchange = async e => {
 };
 $('#clearBtn').onclick = async () => {
   if (Rec.id) Rec.stop();
-  if (await confirmBox('Clear ALL data on this device?', `This deletes everything this app saved in the browser: ${Model.classes.length - 1} gestures and ${Model.total()} pictures, your code blocks, the deployed model, test results and settings. Export first if you want to keep the gestures. The program already on the robot stays there. This cannot be undone.`, 'Clear all data')){
+  if (await confirmBox('Clear all data on this device?', `All ${Model.classes.length - 1} gestures and ${Model.total()} pictures will be deleted from this browser. Export first if you want to keep a copy. This cannot be undone.`, 'Clear data')){
     if (Robot.running) Robot.stop();
-    closeTry();
-    try { Object.keys(localStorage).filter(k => k.startsWith('cg.') && k !== 'cg.cam' && k !== 'cg.lens').forEach(k => localStorage.removeItem(k)); } catch {}
-    await IDB.del('data'); await IDB.del('blocks');
-    Model.reset(); Engine.reset(); Model.savedAt = 0; Model.bytes = 0;
-    Brain.dep = null; Brain.probe = null; Brain.fitted = {}; Lab.res = {}; Lab.sig = ''; Lab.focus = null;
-    Robot.gmap = {}; Robot.upHash = '';
-    Object.assign(S, {trim:0, steady:3, strict:1, defSpeed:START_SPEED, testFrac:.2}); saveSettings();
-    $('#progName').value = 'My robot';
-    if (Code.ws){ Code.ws.clear(); Blockly.serialization.workspaces.load(DEFAULT_PROGRAM, Code.ws); }
-    await Model.save(); LS.del('blocks');
-    if (S.mode === 'live') setMode('collect');
-    renderAll(); toast('All data cleared from this device', 'ok'); logEvent('All device data cleared');
+    Model.reset(); Engine.reset(); LS.del('data'); LS.del('savedAt'); Model.savedAt = 0; Model.bytes = 0; Model.save();
+    renderAll(); toast('All gesture data cleared from this device', 'ok'); logEvent('Device data cleared');
   }
 };
 
 // collect → train → live
-$('#toTrain').onclick = () => setMode('code');
+$('#toTrain').onclick = () => setMode('train');
 $('#defSpeed').addEventListener('input', e => { S.defSpeed = +e.target.value; setRange(e.target); saveSettings(); renderDef(); renderSpeed(); Code.changed(); });
 $('#frac').addEventListener('input', e => { S.testFrac = +e.target.value/100; setRange(e.target); saveSettings(); renderLabData(); });
 $('#runAll').onclick = () => runLab();
@@ -2297,8 +2229,8 @@ $('#algos').addEventListener('click', e => {
   if (e.target.closest('[data-try]')){ openTry(k); return; }
   if (Lab.res[k]?.state === 'done' && !Lab.running){ Lab.focus = k; $$('#algos .algo').forEach(a => a.classList.toggle('focus', a.dataset.k === k)); renderDetail(); }
 });
-$('#labGo').onclick = () => Brain.deployed() ? setMode('live') : toast('Deploy a model first: tap Deploy on one of the 4 cards', 'warn');
-$('#toLive').onclick = () => setMode('train');
+$('#labGo').onclick = () => Brain.deployed() ? setMode('code') : toast('Deploy a model first: tap Deploy on one of the 4 cards', 'warn');
+$('#toLive').onclick = () => setMode('live');
 $('#brainCard').addEventListener('click', e => { if (e.target.closest('[data-gotrain]')) setMode('train'); });
 $('#progCard').addEventListener('click', e => { if (e.target.closest('[data-gocode]')) setMode('code'); });
 // model pickers (Train → Try, Code → Test)
@@ -2316,15 +2248,11 @@ $('#progName').value = LS.get('progName', 'My robot');
 $('#progName').addEventListener('input', e => { LS.set('progName', e.target.value); Code.changed(); });
 $('#upBtn').onclick = () => Robot.upload();
 $('#cats').addEventListener('click', e => { const b = e.target.closest('[data-cat]'); if (b) Code.pick(b.dataset.cat); });
-$('#exBtn').onclick = () => { if (Code.ws) $('#exModal').hidden = false; else toast('The block editor is still loading', 'warn'); };
-$$('#exModal [data-close]').forEach(b => b.onclick = () => $('#exModal').hidden = true);
-$('#exModal').addEventListener('click', e => {
-  const b = e.target.closest('[data-ex]'); if (!b) return;
-  if (b.dataset.ex === 'each' && !Model.classes.some(c => !c.bg)){ toast('Add gestures in Collect first', 'warn'); return; }
-  $('#exModal').hidden = true;
-  Code.ws.clear(); Blockly.serialization.workspaces.load(b.dataset.ex === 'each' ? exampleEachAction() : DEFAULT_PROGRAM, Code.ws); Code.save();
-  toast(b.dataset.ex === 'each' ? 'Example loaded: one script for every gesture' : 'Example loaded: drive by gestures', 'ok');
-});
+$('#exBtn').onclick = async () => {
+  if (!Code.ws) return;
+  if (!(await confirmBox('Load the example program?', 'Your blocks will be replaced by the recommended program: the robot follows your gestures and the LCD and OLED show what it sees.', 'Load example'))) return;
+  Code.ws.clear(); Blockly.serialization.workspaces.load(DEFAULT_PROGRAM, Code.ws); Code.save(); toast('Example program loaded', 'ok');
+};
 $('#runBtn').onclick = $('#wsRun').onclick = () => Robot.toggle();
 /* wiring check: hold a button, the wheels turn (keeps sending while held) */
 let jogT = 0;
@@ -2362,8 +2290,7 @@ let demoI = 0; setInterval(() => { const cs = $$('#demoCards .gcard'); cs.forEac
 $('#footYear').textContent = new Date().getFullYear();
 renderLogos();
 Gauge.build();
-Model.reset();                                   // empty until the saved pictures are read (async)
-Model.load().then(() => renderAll());
+Model.load();
 renderAll();
 setView('home');
 requestAnimationFrame(() => document.body.classList.add('loaded'));
