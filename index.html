@@ -394,11 +394,13 @@
       <span class="tag" id="progState">Not uploaded</span>
       <span class="upbar" id="upBar" hidden><i></i></span>
       <span class="sp"></span>
+      <button class="btn" id="exBtn" title="Load the recommended program"><svg class="i"><use href="#i-bulb"/></svg><span>Example</span></button>
       <button class="btn" id="upBtn"><svg class="i"><use href="#i-upload"/></svg><span>Upload</span></button>
       <button class="btn btn--brand" id="runBtn"><svg class="i"><use href="#i-play"/></svg><span>Run</span></button>
     </div>
     <div class="code-grid">
       <div class="ws">
+        <nav class="cats" id="cats" aria-label="Block categories"></nav>
         <div id="blockly"></div>
         <button class="ws-run" id="wsRun" title="Run the program on the robot"><svg class="i"><use href="#i-play"/></svg></button>
         <div class="ws-msg" id="wsMsg"><i class="spin dark"></i><span>Loading the block editor…</span></div>
@@ -1826,16 +1828,18 @@ const BLOCK_ICONS = {cq_start:'play', cq_when_g:'hand', cq_when_none:'eyeoff', c
 const CATS = [['Events', 'ev', 'play'], ['Gestures', 'ge', 'hand'], ['Motion', 'mo', 'up'], ['Control', 'ct', 'repeat'], ['Display', 'di', 'lcd'], ['Light', 'li', 'bulb'], ['My blocks', 'fn', 'puzzle']];
 
 /* the program that appears the first time */
+/* recommended program: the robot follows your gestures, the screens show what it sees */
 const DEFAULT_PROGRAM = {blocks:{languageVersion:0, blocks:[
-  {type:'cq_start', x:40, y:40, next:{block:{type:'cq_lcd', fields:{ROW:'0', TXT:'COGNOQUEST'}, next:{block:{type:'cq_lcd', fields:{ROW:'1', TXT:'Show me a gesture!'}, next:{block:{type:'cq_face', fields:{K:'0'}, next:{block:{type:'cq_follow'}}}}}}}}},
-  {type:'cq_when_none', x:40, y:330, next:{block:{type:'cq_oled', fields:{LINE:'3', TXT:'...', SIZE:'2'}}}}
+  {type:'cq_start', x:30, y:30, next:{block:{type:'cq_lcd', fields:{ROW:'0', TXT:'COGNOQUEST ROBOT'}, next:{block:{type:'cq_lcd', fields:{ROW:'1', TXT:'AI: {m}'}, next:{block:{type:'cq_lcd', fields:{ROW:'2', TXT:'Speed: {s}'}, next:{block:{type:'cq_face', fields:{K:'0'}, next:{block:{type:'cq_follow'}}}}}}}}}}},
+  {type:'cq_when_g', x:30, y:330, fields:{G:'__any'}, next:{block:{type:'cq_show_g', fields:{T:'lcd'}, next:{block:{type:'cq_lcd', fields:{ROW:'2', TXT:'Speed: {s}'}, next:{block:{type:'cq_face', fields:{K:'0'}, next:{block:{type:'cq_led', fields:{ON:'1'}}}}}}}}}},
+  {type:'cq_when_none', x:30, y:560, next:{block:{type:'cq_lcd', fields:{ROW:'3', TXT:'Show a gesture'}, next:{block:{type:'cq_face', fields:{K:'4'}, next:{block:{type:'cq_led', fields:{ON:'0'}}}}}}}}
 ]}};
 
 const Code = {
   ws:null, loading:null, cache:null, saveT:0,
   name(){ return ascii($('#progName').value).trim().slice(0, 20) || 'My robot'; },
   open(){
-    renderRobot(); renderRun();
+    renderRobot(); renderRun(); renderCats();
     if (this.ws){ this.refreshToolbox(); requestAnimationFrame(() => Blockly.svgResize(this.ws)); this.changed(); return; }
     if (!this.loading) this.loading = this.boot().catch(e => {
       console.warn(e); this.loading = null;
@@ -1847,7 +1851,7 @@ const Code = {
     if (!window.Blockly) await loadScript(BLOCKLY_JS);
     defineBlocks();
     this.ws = Blockly.inject('blockly', {
-      toolbox:toolbox(), renderer:'zelos', theme:'cogno', trashcan:true, sounds:false,
+      toolbox:toolbox(), renderer:'zelos', theme:'cogno', trashcan:true, sounds:false, media:'https://unpkg.com/blockly@11.2.1/media/',
       grid:{spacing:28, length:2, colour:'#DCE3EC', snap:true},
       zoom:{controls:true, wheel:true, startScale:matchMedia('(max-width:640px)').matches ? .72 : .95, maxScale:1.8, minScale:.4, scaleSpeed:1.15},
       move:{scrollbars:true, drag:true, wheel:false}
@@ -1856,13 +1860,14 @@ const Code = {
     catch (e) { console.warn(e); this.ws.clear(); Blockly.serialization.workspaces.load(DEFAULT_PROGRAM, this.ws); }
     this.ws.addChangeListener(e => { if (e.isUiEvent) return; this.cache = null; clearTimeout(this.saveT); this.saveT = setTimeout(() => this.save(), 250); });
     new ResizeObserver(() => Blockly.svgResize(this.ws)).observe($('#blockly'));
-    paintCats();
     $('#wsMsg').hidden = true;
     this.changed();
   },
   save(){ if (!this.ws) return; LS.set('blocks', Blockly.serialization.workspaces.save(this.ws)); this.changed(); },
   changed(){ this.cache = null; renderRun(); renderProgCard(); },
-  refreshToolbox(){ if (this.ws){ this.ws.updateToolbox(toolbox()); paintCats(); } },
+  cat:'ev',
+  pick(k){ this.cat = k; renderCats(); if (this.ws){ this.ws.updateToolbox(toolbox()); this.ws.getFlyout()?.scrollToStart?.(); } },
+  refreshToolbox(){ renderCats(); if (this.ws) this.ws.updateToolbox(toolbox()); },
   compiled(force){ if (!this.ws) return {ok:false, error:'Open Code to load your blocks'}; if (!this.cache || force) this.cache = compileProgram(this.ws, this.name()); return this.cache; }
 };
 
@@ -1907,7 +1912,7 @@ function defineBlocks(){
   const txtTip = 'Tip: {g} shows the seen gesture, {s} the speed, {n} the count.';
   Blockly.defineBlocksWithJsonArray([].concat([
     // events
-    {type:'cq_start', message0:'▶  when program starts', nextStatement:null, style:'ev_hat', tooltip:'Runs when you press Run.'},
+    {type:'cq_start', message0:'when program starts', nextStatement:null, style:'ev_hat', tooltip:'Runs when you press Run.'},
     {type:'cq_when_g', message0:'when %1 is seen', args0:[G], nextStatement:null, style:'ge_hat', tooltip:'Runs every time the camera starts seeing this gesture.'},
     {type:'cq_when_none', message0:'when nothing is seen', nextStatement:null, style:'ev_hat', tooltip:'Runs when the camera stops seeing a trained gesture.'},
     // motion
@@ -1915,7 +1920,7 @@ function defineBlocks(){
     {type:'cq_go', message0:'start moving %1', args0:[DIR], ...S_, style:'mo', tooltip:'Keeps moving until another motion block.'},
     {type:'cq_stop', message0:'stop moving', ...S_, style:'mo'},
     {type:'cq_speed', message0:'set speed to %1 %%', args0:[num('PCT', 50, 0, 100, 5)], ...S_, style:'mo', tooltip:'PWM speed for the next moves (0–100%).'},
-    {type:'cq_follow', message0:'drive by gestures', message1:'%1', args1:[{type:'field_label', text:'(moves you chose in Collect)'}], previousStatement:null, style:'mo', tooltip:'Every gesture does the move you picked for it in Collect, until the program stops.'},
+    {type:'cq_follow', message0:'drive by gestures', previousStatement:null, nextStatement:null, style:'mo', tooltip:'Every gesture does the move you picked for it in Collect, until the program stops.'},
     // control
     {type:'cq_wait', message0:'wait %1 seconds', args0:[num('SECS', 1, 0, 600, .1)], ...S_, style:'ct'},
     {type:'cq_repeat', message0:'repeat %1 times', args0:[num('N', 4, 0, 1000, 1)], message1:'%1', args1:[{type:'input_statement', name:'DO'}], ...S_, style:'ct'},
@@ -1952,13 +1957,13 @@ function toolbox(){
     ct:[B('cq_wait'), B('cq_repeat'), B('cq_forever'), B('cq_if'), B('cq_ifelse'), B('cq_until'), B('cq_wait_g'), B('cq_halt')],
     di:[B('cq_lcd'), B('cq_show_g'), B('cq_lcd_clear'), B('cq_oled'), B('cq_face'), B('cq_oled_clear')],
     li:[B('cq_led'), B('cq_vset'), B('cq_vadd')], fn:[B('cq_def'), B('cq_call')]};
-  /* round coloured category buttons (own CSS classes, so Blockly's default rows don't apply) */
-  const css = {container:'cqCat', row:'cqRow', rowcontentcontainer:'cqRowIn', icon:'cqIco', label:'cqLbl', selected:'cqSel'};
-  return {kind:'categoryToolbox', contents:CATS.map(([name, k]) => ({kind:'category', name, categorystyle:k, cssconfig:css, contents:contents[k]}))};
+  const name = (CATS.find(c => c[1] === Code.cat) || CATS[0])[0];
+  return {kind:'flyoutToolbox', contents:[{kind:'label', text:name}, ...contents[Code.cat]]};
 }
-/* paint the category icons (after Blockly draws the toolbox) */
-function paintCats(){
-  $$('#blockly .cqCat').forEach((el, i) => { const c = CATS[i]; if (!c) return; const ic = el.querySelector('.cqIco'); if (ic){ ic.style.setProperty('--cc', getComputedStyle(document.documentElement).getPropertyValue('--cat-' + c[1]) || '#F5821E'); ic.style.backgroundImage = `url("${iconURI(c[2])}")`; } });
+/* our own SPIKE-style category rail (round icon buttons) */
+function renderCats(){
+  const el = $('#cats'); if (!el) return;
+  el.innerHTML = CATS.map(([name, k, ic]) => `<button data-cat="${k}" class="${Code.cat === k ? 'on' : ''}" style="--cc:var(--cat-${k})"><i style="background-image:url('${iconURI(ic)}')"></i><span>${name}</span></button>`).join('');
 }
 
 /* blocks → bytecode lines for the robot (same format the .ino reads) */
@@ -2242,6 +2247,12 @@ $$('[data-camon] button').forEach(b => b.onclick = () => Cam.power(true));
 $('#progName').value = LS.get('progName', 'My robot');
 $('#progName').addEventListener('input', e => { LS.set('progName', e.target.value); Code.changed(); });
 $('#upBtn').onclick = () => Robot.upload();
+$('#cats').addEventListener('click', e => { const b = e.target.closest('[data-cat]'); if (b) Code.pick(b.dataset.cat); });
+$('#exBtn').onclick = async () => {
+  if (!Code.ws) return;
+  if (!(await confirmBox('Load the example program?', 'Your blocks will be replaced by the recommended program: the robot follows your gestures and the LCD and OLED show what it sees.', 'Load example'))) return;
+  Code.ws.clear(); Blockly.serialization.workspaces.load(DEFAULT_PROGRAM, Code.ws); Code.save(); toast('Example program loaded', 'ok');
+};
 $('#runBtn').onclick = $('#wsRun').onclick = () => Robot.toggle();
 /* wiring check: hold a button, the wheels turn (keeps sending while held) */
 let jogT = 0;
